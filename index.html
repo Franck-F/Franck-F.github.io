@@ -1,754 +1,778 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rédaction Automatique des Comptes Rendus</title>
+    <title>Dashboard d'Automatisation des Processus Métier</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Visualization & Content Choices:
-        - Accueil: Text introduction. Goal: Orient.
-        - Le Défi: Icon-based cards for limitations, accordions for requirements. Goal: Inform, Organize. Method: HTML/CSS, JS for accordions.
-        - Fondamentaux Technologiques: Accordions for Data Extraction, NLP/NLU, LLMs. Goal: Educate. Method: HTML/CSS + JS.
-        - Panorama des Solutions - Outils IA Dédiés: Cards for tools, interactive table (HTML/JS sort/filter if complex) or a Chart.js Bar chart comparing key features (e.g., Customization, Integration). Goal: Compare. Method: HTML/CSS, Chart.js. Data from report's table.
-        - Panorama des Solutions - LLMs Locaux (LM Studio): Features list, RAG concept diagram (HTML/CSS). Goal: Explain.
-        - Panorama des Solutions - Microsoft Copilot: Features list. Goal: Inform.
-        - Panorama des Solutions - Plateformes d'Automatisation Doc: Cards for platforms, Chart.js Radar chart for comparing capabilities (Logic, Tables, Integration, Cost Factor). Goal: Compare. Method: HTML/CSS, Chart.js. Data from report's table.
-        - Chart: LLM Local vs. Cloud (Bar chart from report data). Goal: Compare. Method: Chart.js.
-        - Considérations Clés: Accordions for cost-benefit, security, scalability, maintenance. Goal: Guide.
-        - Conclusion & Recommandations: Bulleted list for actionable insights. Goal: Summarize.
-        - All charts are Canvas-based (Chart.js). No SVG/Mermaid. All textual content is summarized/extracted from the provided source report.
-    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: "Bert Consultant" - Un fond blanc cassé avec le bleu sarcelle (#00A99D) et le violet foncé (#3F2A56) du logo comme couleurs primaires et secondaires. -->
+    <!-- Application Structure Plan: L'application est conçue comme un tableau de bord stratégique en 4 sections, guidant l'utilisateur de la problématique à la solution. 1) 'Diagnostic' expose le flux de travail inefficace actuel. 2) 'Explorateur de Processus' permet une immersion interactive dans chaque processus via des cartes filtrables. 3) 'Analyse des Frictions' agrège et visualise les problèmes récurrents et les synergies entre processus pour en souligner l'impact systémique. 4) 'La Solution IA' présente l'architecture d'agents IA proposée de manière visuelle et compréhensible. Cette structure non-linéaire transforme le rapport statique en un outil d'exploration et de prise de décision. -->
+    <!-- Visualization & Content Choices: 1. Diagnostic (Flux actuel): Diagramme HTML/CSS simple (Goal: Informer). 2. Priorités d'Automatisation: Graphique en anneau Chart.js (Goal: Comparer). 3. Frictions Systémiques: Graphique à barres Chart.js (Goal: Analyser). 4. Matrice de Similitude: Tableau interactif (HTML Table) avec coloration de type heatmap et mise en évidence au survol pour explorer les synergies (Goal: Explorer & Analyser). 5. Architecture de la Solution: Simulation de flux de travail interactive pour démontrer le système d'agents MCP (Goal: Expliquer & Engager). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; background-color: #FFFBF0; color: #374151; }
-        .sidebar { background-color: #1F2937; color: #E5E7EB; }
-        .sidebar-link { transition: all 0.3s ease; }
-        .sidebar-link.active, .sidebar-link:hover { background-color: #60A5FA; color: #FFFFFF; }
-        .content-section { display: none; }
-        .content-section.active { display: block; }
-        .tab-button { transition: all 0.3s ease; border-bottom-width: 2px; border-color: transparent; }
-        .tab-button.active { border-color: #60A5FA; color: #60A5FA; font-weight: 600;}
-        .chart-container { position: relative; width: 100%; max-width: 700px; margin-left: auto; margin-right: auto; height: 350px; max-height: 450px; background-color: #FFFFFF; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); }
-        @media (min-width: 768px) { .chart-container { height: 400px; max-height: 500px;} }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .card { background-color: #FFFFFF; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-        h2 { color: #1E40AF; } h3 { color: #1D4ED8; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #F5F5DC; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #60A5FA; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB; /* Light gray background */
+            color: #374151; /* Darker gray text */
+        }
+        :root {
+            --primary-color: #00A99D; /* Teal */
+            --secondary-color: #3F2A56; /* Dark Purple */
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .tag-red { background-color: #FECACA; color: #991B1B; }
+        .tag-orange { background-color: #FDE68A; color: #92400E; }
+        .tag-blue { background-color: #BFDBFE; color: #1E40AF; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        #solution-container {
+            position: relative;
+        }
+        #solution-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .agent-node {
+            transition: all 0.5s ease;
+            opacity: 0.4;
+            transform: scale(0.95);
+            position: relative;
+            z-index: 2;
+        }
+        .agent-node.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 169, 157, 0.6);
+        }
+        .agent-node.clickable {
+             cursor: pointer;
+        }
+        .interactive-table-container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .interactive-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.8rem;
+        }
+        .interactive-table th, .interactive-table td {
+            border: 1px solid #E2E8F0;
+            padding: 0.5rem;
+            text-align: center;
+            position: relative;
+        }
+        .interactive-table th {
+            background-color: #F8FAFC;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        .interactive-table th.col-header {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            padding: 0.75rem 0.25rem;
+        }
+        .interactive-table th.highlight, .interactive-table td.highlight-strong {
+            background-color: #A7F3D0; /* Light Teal */
+        }
+         .interactive-table td.highlight-weak {
+            background-color: #E0E7FF; /* Light purple */
+         }
+         .interactive-table td {
+            transition: background-color 0.2s;
+         }
+        .interactive-table td .tooltip {
+            visibility: hidden;
+            width: 80px;
+            background-color: var(--secondary-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 20;
+            bottom: 110%;
+            left: 50%;
+            margin-left: -40px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+         .interactive-table td:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="flex flex-col md:flex-row min-h-screen">
-        <aside class="sidebar w-full md:w-72 p-6 space-y-4 shadow-xl md:sticky md:top-0 md:h-screen md:overflow-y-auto">
-            <h1 class="text-2xl font-bold text-center text-blue-300 mb-6">Comptes Rendus de Copil</h1>
-            <nav class="space-y-2 text-lg">
-                <a href="#accueil" class="sidebar-link block py-3 px-4 rounded-md active">Introduction</a>
-                <a href="#defi" class="sidebar-link block py-3 px-4 rounded-md">Le Défi Actuel</a>
-                <a href="#fondamentaux" class="sidebar-link block py-3 px-4 rounded-md">Fondamentaux Technologiques</a>
-                <a href="#solutions" class="sidebar-link block py-3 px-4 rounded-md">Panorama des Solutions</a>
-                <a href="#considerations" class="sidebar-link block py-3 px-4 rounded-md">Considérations Clés</a>
-                <a href="#conclusion" class="sidebar-link block py-3 px-4 rounded-md">Conclusion & Recommandations</a>
-            </nav>
-        </aside>
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <img src="https://storage.googleapis.com/contextual_user_image_795326555/logo-bert-consultant-xs.jpg" alt="Logo Bert Consultant" class="h-12">
+            <ul class="flex space-x-8">
+                <li><a href="#diagnostic" class="nav-link text-gray-600 hover:text-gray-900">Diagnostic</a></li>
+                <li><a href="#explorer" class="nav-link text-gray-600 hover:text-gray-900">Explorateur</a></li>
+                <li><a href="#analyse" class="nav-link text-gray-600 hover:text-gray-900">Analyse</a></li>
+                <li><a href="#solution" class="nav-link text-gray-600 hover:text-gray-900">La Solution</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <main class="flex-1 p-6 md:p-10 bg-beige-50 overflow-y-auto">
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="diagnostic" class="text-center py-16">
+            <h2 class="text-4xl font-bold mb-4 text-gray-800">Le Constat : Une Inefficacité Structurelle</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12">
+                L'analyse des processus révèle une dépendance critique à une "trinité documentaire" (PDF, Excel, Word) qui freine la productivité, augmente les risques d'erreur et empêche une vision consolidée des données. Cette section illustre le flux de travail manuel au cœur du problème.
+            </p>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-4">
+                <div class="bg-white p-6 rounded-xl shadow-md text-center w-64">
+                    <div class="text-4xl mb-3">📄</div>
+                    <h3 class="text-lg font-semibold text-gray-800">PDF & Scans</h3>
+                    <p class="text-sm text-gray-500">Documents d'entrée non structurés</p>
+                </div>
+                <div class="text-2xl text-gray-300 mx-4 hidden md:block">→</div>
+                <div class="bg-white p-6 rounded-xl shadow-md text-center w-64">
+                    <div class="text-4xl mb-3">📊</div>
+                    <h3 class="text-lg font-semibold text-gray-800">Excel</h3>
+                    <p class="text-sm text-gray-500">Saisie manuelle & silos de données</p>
+                </div>
+                <div class="text-2xl text-gray-300 mx-4 hidden md:block">→</div>
+                <div class="bg-white p-6 rounded-xl shadow-md text-center w-64">
+                    <div class="text-4xl mb-3">📝</div>
+                    <h3 class="text-lg font-semibold text-gray-800">Word & PPT</h3>
+                    <p class="text-sm text-gray-500">Rapports finaux manuels</p>
+                </div>
+            </div>
+            <p class="max-w-3xl mx-auto text-md text-gray-600 mt-12">
+                Ce cycle manuel est non seulement chronophage mais constitue un risque opérationnel majeur. La solution n'est pas d'accélérer ce cycle, mais de le réinventer en s'attaquant à sa racine : l'architecture de données fragmentée.
+            </p>
+        </section>
+
+        <section id="explorer" class="py-16">
+            <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Explorateur des Processus Métier</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12 text-center">
+                Plongez au cœur des opérations. Chaque processus a été analysé pour identifier son flux, ses outils et ses points faibles. Utilisez les filtres pour naviguer et cliquez sur une carte pour afficher les détails.
+            </p>
+
+            <div class="flex justify-center mb-8 space-x-2" id="filters">
+                <button class="filter-btn active text-white px-4 py-2 rounded-full font-semibold" style="background-color: var(--secondary-color);">Tous</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Audit">Audit & Contrôle</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Gestion">Gestion Contractuelle</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Analyse">Analyse & Décision</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Étude">Études & Finances</button>
+            </div>
+
+            <div id="process-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+
+            <div id="process-detail" class="hidden mt-12 bg-white p-8 rounded-xl shadow-lg">
+                <button id="close-detail" class="float-right font-bold text-2xl text-gray-500 hover:text-gray-800">&times;</button>
+                <h3 id="detail-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                <div class="space-x-2 mb-4">
+                    <span id="detail-category" class="tag"></span>
+                    <span id="detail-priority" class="tag"></span>
+                </div>
+                <p id="detail-description" class="text-gray-600 mb-6"></p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-lg mb-3 text-gray-800">Flux de Travail :</h4>
+                        <ul id="detail-workflow" class="list-none space-y-3"></ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg mb-3 text-gray-800">Points de Friction :</h4>
+                        <ul id="detail-painpoints" class="list-disc list-inside space-y-2 text-red-700"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analyse" class="py-16 bg-white rounded-2xl">
+            <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Analyse Globale des Frictions et Synergies</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12 text-center">
+                Les problèmes ne sont pas isolés. Cette analyse agrégée révèle des points de friction systémiques et des synergies fortes entre processus, justifiant une approche de solution centralisée et réutilisable.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Priorités d'Automatisation</h3>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Frictions les Plus Courantes</h3>
+                     <div class="chart-container" style="max-width: 600px; height: 350px;">
+                        <canvas id="painPointChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-20">
+                 <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Tableau Interactif des Synergies</h3>
+                 <p class="max-w-3xl mx-auto text-md text-gray-600 mb-8 text-center">
+                    Survolez le tableau pour explorer les synergies. Une couleur intense indique une forte similarité. L'infobulle vous donne le pourcentage exact et les en-têtes sont mis en évidence pour une meilleure lisibilité.
+                </p>
+                <div id="interactive-table-container" class="overflow-x-auto p-4"></div>
+            </div>
+        </section>
+
+        <section id="solution" class="py-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Simulation du Système Multi-Agent MCP</h2>
+             <p class="max-w-4xl mx-auto text-lg text-gray-600 mb-8 text-center">
+               Sélectionnez un processus pour voir comment les agents spécialisés collaborent dans n8n. Cliquez sur un agent activé pour découvrir son rôle et les technologies qu'il emploie.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
+                <select id="process-selector" class="block w-full sm:w-72 px-4 py-3 text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-teal-500 focus:border-teal-500" style="color: var(--secondary-color);">
+                    <option value="rao">Analyse des Offres (RAO)</option>
+                    <option value="suivi_contrat">Suivi de Contrat (Début)</option>
+                    <option value="rpqs">Rapport Annuel (RPQS)</option>
+                </select>
+                <button id="start-simulation" class="w-full sm:w-auto text-white font-bold py-3 px-6 rounded-lg transition-colors" style="background-color: var(--primary-color); hover:background-color: #008a7e;">Démarrer la Simulation</button>
+            </div>
             
-            <section id="accueil" class="content-section active space-y-6">
-                <div class="bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 class="text-4xl font-extrabold mb-6">Rédaction des Comptes Rendus</h2>
-                    <p class="text-lg text-gray-700 mb-4">
-                        L'objectif de cette présentation est de mettre en lumière comment des outils d'IA peuvent transformer ce processus.
-                    </p>
-                    <p class="text-lg text-gray-700 mb-6">
-                        Utilisez le menu latéral pour explorer les différentes sections.
-                    <button onclick="navigateToSection('#solutions')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-lg">
-                        Découvrir les Solutions
-                    </button>
-                </div>
-            </section>
-
-            <section id="defi" class="content-section space-y-8">
-                <div class="bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 class="text-3xl font-bold mb-6">I. Comprendre le Défi de la Rédaction Automatisée</h2>
-                    <p class="text-lg text-gray-700 mb-8">La rédaction manuelle des comptes rendus à partir de notes souvent non structurées est une source majeure d'inefficacité. Cette section explore la nature de ces défis et les exigences pour une automatisation réussie.</p>
-                    
-                    <div class="space-y-6">
-                        <div class="card p-6">
-                            <h3 class="text-2xl font-semibold mb-3">A. La Nature des Données Non Structurées (Notes)</h3>
-                            <p class="text-gray-600 mb-3">Les notes de réunion sont typiquement non structurées, sans modèle de données prédéfini. Cela rend difficile :</p>
-                            <ul class="list-disc list-inside text-gray-600 space-y-1 pl-4">
-                                <li>L'identification précise des points de données pertinents.</li>
-                                <li>La reconnaissance des relations entre informations.</li>
-                                <li>L'intégration dans des formats structurés.</li>
-                            </ul>
-                            <p class="text-gray-600 mt-3">La diversité des formats (texte, PDF, images, manuscrit) et la qualité variable accentuent la complexité de l'extraction manuelle, qui est chronophage et sujette aux erreurs.</p>
+            <div id="solution-container" class="relative bg-white p-8 rounded-2xl shadow-xl min-h-[500px]">
+                <canvas id="solution-canvas"></canvas>
+                 <div class="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-20 items-center justify-items-center">
+                    <!-- Agent Collecte -->
+                    <div id="agent-0" class="agent-node flex flex-col items-center text-center">
+                        <div class="w-32 h-32 bg-blue-100 border-2 border-blue-300 rounded-full flex flex-col items-center justify-center p-2 shadow-md">
+                            <span class="text-4xl">📁</span>
+                            <h5 class="font-bold text-blue-800">Agent Collecte</h5>
                         </div>
-
-                        <div class="card p-6">
-                            <h3 class="text-2xl font-semibold mb-3">B. Les Limitations des Processus Manuels Actuels</h3>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="flex items-start space-x-3 bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
-                                    <span class="text-2xl">⏱️</span>
-                                    <div><strong class="text-red-700">Chronophage & Répétitif :</strong> Mobilise des ressources précieuses.</div>
-                                </div>
-                                <div class="flex items-start space-x-3 bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
-                                    <span class="text-2xl">⚠️</span>
-                                    <div><strong class="text-yellow-700">Risque d'Erreurs Élevé :</strong> Saisie incorrecte, omissions, informations obsolètes.</div>
-                                </div>
-                                <div class="flex items-start space-x-3 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                                    <span class="text-2xl">📉</span>
-                                    <div><strong class="text-blue-700">Manque de Cohérence :</strong> Difficulté à maintenir formatage et ton uniformes.</div>
-                                </div>
-                                 <div class="flex items-start space-x-3 bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-                                    <span class="text-2xl">🔗</span>
-                                    <div><strong class="text-green-700">Difficulté de Suivi :</strong> Localisation d'informations spécifiques et suivi des obligations entravés.</div>
-                                </div>
-                            </div>
-                             <p class="text-gray-600 mt-4">Ces limitations engendrent des coûts cachés (erreurs, délais, non-conformité) et freinent l'agilité opérationnelle.</p>
+                    </div>
+                    <!-- Agent Vérification -->
+                    <div id="agent-1" class="agent-node flex flex-col items-center text-center">
+                         <div class="w-32 h-32 bg-yellow-100 border-2 border-yellow-300 rounded-full flex flex-col items-center justify-center p-2 shadow-md">
+                            <span class="text-4xl">🔍</span>
+                            <h5 class="font-bold text-yellow-800">Agent Vérification</h5>
                         </div>
-
-                        <div class="card p-6 accordion-item">
-                            <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                    C. Exigences Clés pour l'Automatisation 
-                                    <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-2">
-                                <p><strong>Précision et Exhaustivité :</strong> Fiabilité des données extraites et des rapports générés.</p>
-                                <p><strong>Compréhensibilité :</strong> Rapports clairs, mettant en évidence les informations essentielles et actions.</p>
-                                <p><strong>Cohérence :</strong> Homogénéité entre tous les rapports, éliminant la variabilité manuelle.</p>
-                                <p><strong>Adaptabilité :</strong> Personnalisation des résumés, mises en page, sections pour correspondre aux modèles et besoins métier.</p>
-                                <p><strong>Évolutivité :</strong> Gestion efficace de volumes croissants de données sans dégradation des performances.</p>
-                                <p><strong>Sécurité Robuste :</strong> Chiffrement, contrôles d'accès, pistes d'audit pour protéger les informations sensibles.</p>
-                                <p class="mt-2">Il est crucial de pouvoir contrôler la sortie de l'IA et d'assurer une gouvernance des données rigoureuse.</p>
-                            </div>
+                    </div>
+                    <!-- Agent Structuration -->
+                    <div id="agent-2" class="agent-node flex flex-col items-center text-center">
+                        <div class="w-32 h-32 bg-green-100 border-2 border-green-300 rounded-full flex flex-col items-center justify-center p-2 shadow-md">
+                            <span class="text-4xl">📊</span>
+                            <h5 class="font-bold text-green-800">Agent Structuration</h5>
+                        </div>
+                    </div>
+                     <!-- Agent Rédaction -->
+                    <div id="agent-3" class="agent-node flex flex-col items-center text-center">
+                         <div class="w-32 h-32 bg-purple-100 border-2 border-purple-300 rounded-full flex flex-col items-center justify-center p-2 shadow-md">
+                            <span class="text-4xl">📄</span>
+                            <h5 class="font-bold text-purple-800">Agent Rédaction</h5>
+                        </div>
+                    </div>
+                     <!-- Agent Présentation -->
+                     <div id="agent-4" class="agent-node flex flex-col items-center text-center">
+                         <div class="w-32 h-32 bg-pink-100 border-2 border-pink-300 rounded-full flex flex-col items-center justify-center p-2 shadow-md">
+                            <span class="text-4xl">📽️</span>
+                            <h5 class="font-bold text-pink-800">Agent Présentation</h5>
+                        </div>
+                    </div>
+                     <!-- Agent Communication -->
+                     <div id="agent-5" class="agent-node flex flex-col items-center text-center">
+                         <div class="w-32 h-32 bg-indigo-100 border-2 border-indigo-300 rounded-full flex flex-col items-center justify-center p-2 shadow-md">
+                            <span class="text-4xl">📤</span>
+                            <h5 class="font-bold text-indigo-800">Agent Communication</h5>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <section id="fondamentaux" class="content-section space-y-8">
-                 <div class="bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 class="text-3xl font-bold mb-6">II. Fondamentaux Technologiques</h2>
-                    <p class="text-lg text-gray-700 mb-8">L'automatisation de la rédaction de comptes rendus repose sur plusieurs technologies clés. Cette section détaille les mécanismes d'extraction de données, le rôle du Traitement du Langage Naturel (NLP) et l'utilisation des Grands Modèles de Langage (LLM).</p>
-
-                    <div class="space-y-6">
-                        <div class="card p-6 accordion-item">
-                            <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                A. Extraction de Données à partir de Documents
-                                <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p>La première étape est d'extraire le texte brut. Des outils comme PyPDF2, PyMuPDF pour les PDF, ou des solutions d'OCR (Reconnaissance Optique de Caractères) pour les documents scannés/images sont utilisés. Document AI de Google ou le Retriever Extraction de NVIDIA (via Langflow) sont des exemples d'outils IA plus avancés pour cette tâche.</p>
-                                <p><strong>Points Importants :</strong></p>
-                                <ul class="list-disc list-inside pl-4">
-                                    <li>Le choix de l'outil dépend de la qualité et du format des notes (texte numérique vs. manuscrit scanné).</li>
-                                    <li>Le pré-traitement (nettoyage, segmentation, structuration en JSON) est crucial avant de soumettre les données aux LLM.</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="card p-6 accordion-item">
-                             <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                B. Traitement du Langage Naturel (TLN/NLP) et Compréhension (NLU)
-                                <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p>Le TLN permet aux machines de comprendre et d'interpréter le langage humain. La NLU se concentre sur la signification précise.</p>
-                                <p><strong>Tâches Fondamentales du TLN :</strong></p>
-                                <ul class="list-disc list-inside pl-4">
-                                    <li><strong>Reconnaissance d'Entités Nommées (REN) :</strong> Identifier personnes, organisations, dates.</li>
-                                    <li><strong>Extraction de Relations :</strong> Discerner les liens entre entités.</li>
-                                    <li><strong>Extraction d'Événements :</strong> Identifier les occurrences (qui, quoi, où, quand).</li>
-                                </ul>
-                                 <p>L'efficacité dépend de l'adaptation au domaine spécifique et de la qualité des données d'entraînement. Pour des rapports spécialisés, un ajustement fin des modèles est souvent nécessaire.</p>
-                            </div>
-                        </div>
-
-                        <div class="card p-6 accordion-item">
-                             <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                C. Modèles de Langage Étendus (LLMs) pour l'Extraction et la Synthèse
-                                 <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p>Les LLM sont puissants pour extraire et synthétiser des informations, pouvant générer des sorties structurées (JSON) à partir de texte brut. L'ajustement fin de modèles plus petits (Llama2, Phi-3) sur des données spécifiques permet d'adhérer à des schémas précis.</p>
-                                <p><strong>LM Studio (LLM Local) :</strong> Permet d'exécuter des LLM localement, offrant confidentialité, faible latence, et accès hors ligne. Sa fonction RAG (Retrieval Augmented Generation) permet d'ancrer les réponses sur des documents locaux (notes fournies), améliorant la pertinence.</p>
-                                <p><strong>Défis des LLM :</strong></p>
-                                 <ul class="list-disc list-inside pl-4">
-                                    <li>Propension aux "hallucinations" (nécessite validation).</li>
-                                    <li>Intensité computationnelle (coûts pour grands volumes).</li>
-                                </ul>
-                                <p class="mt-4">Une validation humaine robuste est indispensable pour les applications critiques.</p>
-                                <div class="mt-6 chart-container">
-                                    <canvas id="llmComparisonChart"></canvas>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2 text-center">Ce graphique illustre les compromis généraux entre LLMs locaux et cloud basés sur le rapport.</p>
-                            </div>
-                        </div>
+            </div>
+            <!-- Modal for agent details -->
+            <div id="agent-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full m-4">
+                    <div class="flex justify-between items-start">
+                        <h3 id="modal-title" class="text-2xl font-bold" style="color: var(--secondary-color);"></h3>
+                        <button id="close-modal" class="text-3xl font-light leading-none hover:text-red-500">&times;</button>
                     </div>
+                    <hr class="my-4">
+                    <p id="modal-description" class="text-gray-600 mb-4"></p>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-800">Nœuds n8n typiques :</h4>
+                    <p id="modal-nodes" class="text-sm text-gray-700 bg-gray-100 p-3 rounded-md" style="border-left: 4px solid var(--primary-color);"></p>
                 </div>
-            </section>
+            </div>
+        </section>
+    </main>
 
-            <section id="solutions" class="content-section space-y-8">
-                <div class="bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 class="text-3xl font-bold mb-6">III. Solutions d'Automatisation et Outils IA Spécifiques</h2>
-                    <p class="text-lg text-gray-700 mb-8">Cette section explore les différentes catégories d'outils disponibles pour automatiser la rédaction de comptes rendus, des solutions dédiées aux réunions aux plateformes d'automatisation documentaire plus générales, en passant par les LLMs locaux et les intégrations avec les outils de productivité.</p>
+    <footer class="text-white text-center py-6" style="background-color: var(--secondary-color);">
+        <p>&copy; 2025 - Dashboard d'Analyse Stratégique</p>
+    </footer>
 
-                    <div class="mb-6 border-b border-gray-300">
-                        <nav class="flex flex-wrap -mb-px" aria-label="Tabs">
-                            <button data-tab="outils-ia" class="solutions-tab-button active text-lg font-medium py-4 px-6 border-b-2 hover:text-blue-600 focus:outline-none">Outils IA Dédiés</button>
-                            <button data-tab="llm-locaux" class="solutions-tab-button text-lg font-medium py-4 px-6 border-b-2 hover:text-blue-600 focus:outline-none">LLMs Locaux (LM Studio)</button>
-                            <button data-tab="copilot" class="solutions-tab-button text-lg font-medium py-4 px-6 border-b-2 hover:text-blue-600 focus:outline-none">Microsoft Copilot</button>
-                            <button data-tab="plateformes-auto" class="solutions-tab-button text-lg font-medium py-4 px-6 border-b-2 hover:text-blue-600 focus:outline-none">Plateformes d'Automatisation Doc</button>
-                        </nav>
-                    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const processData = [
+                { id: 1, title: "I. Audit de reversement", category: "Audit", priority: "Moyenne", desc: "Contrôle de la conformité des données transmises en fin de contrat.", workflow: ["Collecte des documents (contrats, rapports)", "Vérification et contrôle qualité", "Saisie et structuration des données", "Rédaction du rapport de contrôle"], painPoints: ["Extraction manuelle de données", "Risque d'erreurs dans le rapport"] },
+                { id: 2, title: "II. Transfert de compétence", category: "Étude", priority: "Haute", desc: "État des lieux complet lors d'un transfert de compétence entre entités.", workflow: ["Collecte de documents souvent volumineux", "Mise à jour manuelle des fichiers Excel", "Tâches de consolidation diverses", "Rédaction des rapports et présentations"], painPoints: ["Qualité médiocre des scans", "Processus très chronophage", "Risque élevé d'erreurs de transcription"] },
+                { id: 3, title: "IV. Suivi de Contrat COPIL", category: "Gestion", priority: "Haute", desc: "Suivi régulier des obligations contractuelles pour les comités de pilotage.", workflow: ["Lecture manuelle de contrats longs", "Saisie des échéances dans une grille Excel", "Calcul manuel des pénalités", "Préparation de l'ordre du jour"], painPoints: ["Charge de travail importante", "Risque d'erreurs financières", "Manque de réactivité"] },
+                { id: 4, title: "IX. Analyse des Offres (RAO)", category: "Analyse", priority: "Très Haute", desc: "Analyse comparative complexe d'offres dans le cadre d'appels d'offres.", workflow: ["Lecture et analyse de toutes les offres", "Consolidation manuelle des données pour comparaison", "Rédaction d'une synthèse qualitative", "Préparation du rapport final (RAO)"], painPoints: ["Analyse subjective et non standardisée", "Manque de profondeur analytique possible", "Risque de biais", "Temps de décision allongé"] },
+                { id: 5, title: "XI/XII. Chiffrage & Simulation", category: "Étude", priority: "Très Haute", desc: "Modélisation financière de scénarios et de projections budgétaires.", workflow: ["Collecte manuelle des données d'entrée", "Construction de modèles complexes sur Excel", "Exécution de simulations", "Consolidation des résultats"], painPoints: ["Dépendance à des tableurs Excel complexes", "Risque élevé d'erreurs de modélisation", "Manque de traçabilité des calculs"] },
+                { id: 6, title: "III. Rapport Annuel (RPQS)", category: "Étude", priority: "Moyenne", desc: "Rédaction du Rapport Annuel sur le Prix et la Qualité du Service.", workflow: ["Envoi et collecte de questionnaires", "Analyse des rapports du délégataire", "Consolidation des données multi-sources", "Rédaction du rapport Word et de la présentation PPT"], painPoints: ["Processus long et répétitif", "Consolidation manuelle sujette à oublis"] },
+                 { id: 7, title: "VIII. Suivi de contrat (début)", category: "Gestion", priority: "Haute", desc: "Analyse initiale d'un nouveau contrat pour mettre en place le suivi.", workflow: ["Lecture exhaustive du contrat", "Extraction de toutes les obligations et dates clés", "Création de la grille de suivi Excel"], painPoints: ["Lecture manuelle de documents très longs et denses", "Tâche fastidieuse et chronophage"] }
+            ];
 
-                    <div id="outils-ia" class="solutions-tab-content active space-y-6">
-                        <h3 class="text-2xl font-semibold mb-4">A. Outils IA Dédiés à la Rédaction de Comptes Rendus de Réunion</h3>
-                        <p class="text-gray-600 mb-6">Ces outils automatisent la transcription, identifient les points clés et génèrent des résumés. Ils sont souvent "tout-en-un", s'intégrant avec des CRM et outils collaboratifs. La personnalisation de la structure de sortie est un atout majeur.</p>
-                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">Otter.ai</h4>
-                                <p class="text-sm text-gray-600">Transcription temps réel, support multilingue, intégration Zoom/Teams/Meet.</p>
-                                <p class="text-sm font-medium text-gray-700 mt-2">Prix: Gratuit (limité), payant dès 16,99 $/an.</p>
-                            </div>
-                            <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">Leexi</h4>
-                                <p class="text-sm text-gray-600">Capture et synthèse auto, +150 paramètres, personnalisation structure.</p>
-                                 <p class="text-sm font-medium text-gray-700 mt-2">Prix: Essai gratuit, payant.</p>
-                            </div>
-                            <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">Noota</h4>
-                                <p class="text-sm text-gray-600">Transcription ultra-précise, résumé structuré personnalisable, intégrations CRM/Notion/Slack.</p>
-                                <p class="text-sm font-medium text-gray-700 mt-2">Prix: Non spécifié.</p>
-                            </div>
-                             <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">Fireflies.ai</h4>
-                                <p class="text-sm text-gray-600">Capture et transcription auto, analyse des sentiments.</p>
-                                 <p class="text-sm font-medium text-gray-700 mt-2">Prix: Gratuit, payant dès 10 $/mois.</p>
-                            </div>
-                            <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">ClickUp</h4>
-                                <p class="text-sm text-gray-600">Résumé de notes de réunion IA, automatisation tâches dans sa plateforme de gestion projet.</p>
-                                 <p class="text-sm font-medium text-gray-700 mt-2">Prix: Gratuit, payant dès 5 $/mois/utilisateur.</p>
-                            </div>
-                        </div>
-                        <div class="mt-8 chart-container">
-                            <canvas id="iaToolsChart"></canvas>
-                        </div>
-                         <p class="text-sm text-gray-500 mt-2 text-center">Comparaison qualitative basée sur les fonctionnalités clés mentionnées.</p>
-                    </div>
+            const grid = document.getElementById('process-grid');
+            const detailView = document.getElementById('process-detail');
+            const closeDetailBtn = document.getElementById('close-detail');
 
-                    <div id="llm-locaux" class="solutions-tab-content hidden space-y-6">
-                        <h3 class="text-2xl font-semibold mb-4">B. Utilisation de LLMs Locaux (LM Studio)</h3>
-                        <p class="text-gray-600 mb-4">LM Studio permet d'exécuter des LLM open-source localement, offrant confidentialité et contrôle.</p>
-                        <ul class="list-disc list-inside text-gray-600 space-y-2 pl-4 mb-4">
-                            <li><strong>Confidentialité Totale :</strong> Les données restent sur l'appareil.</li>
-                            <li><strong>RAG (Retrieval Augmented Generation) :</strong> Permet de référencer des documents locaux (notes) pour des réponses contextuelles précises. (Limite: 5 fichiers, 30Mo combinés)</li>
-                            <li><strong>Personnalisation :</strong> Paramètres d'inférence ajustables (température, Top-K/P, invites système).</li>
-                            <li><strong>Coût :</strong> Gratuit pour usage personnel (licence commerciale sur demande). Nécessite matériel adéquat (min 16Go RAM, GPU avec >6Go VRAM recommandé).</li>
-                        </ul>
-                        <div class="card p-6 mt-4">
-                            <h4 class="text-xl font-semibold text-blue-700 mb-3">Concept : Génération Augmentée par Récupération (RAG)</h4>
-                            <div class="text-center">
-                                <div class="inline-block p-4 border border-dashed border-blue-400 rounded-lg">
-                                    <p class="text-sm">📄 Vos Notes (PDF, DOCX)</p>
-                                    <p class="text-2xl my-2">⬇️</p>
-                                    <p class="text-sm bg-blue-100 text-blue-700 p-2 rounded">🧠 LM Studio (LLM Local)</p>
-                                    <p class="text-sm my-1">avec fonction RAG</p>
-                                    <p class="text-2xl my-2">⬇️</p>
-                                    <p class="text-sm">📝 Extraction / Synthèse Basée sur vos Notes</p>
-                                    <p class="text-2xl my-2">⬇️</p>
-                                    <p class="text-sm">📋 Compte Rendu Contextualisé</p>
-                                </div>
-                            </div>
-                             <p class="text-xs text-gray-500 mt-2 text-center">Schéma simplifié du processus RAG avec LM Studio.</p>
-                        </div>
-                    </div>
-
-                    <div id="copilot" class="solutions-tab-content hidden space-y-6">
-                        <h3 class="text-2xl font-semibold mb-4">C. Intégration avec Microsoft Copilot</h3>
-                        <p class="text-gray-600 mb-4">Microsoft 365 Copilot s'intègre profondément dans Word, Teams, etc.</p>
-                        <ul class="list-disc list-inside text-gray-600 space-y-2 pl-4 mb-4">
-                            <li><strong>Dans Teams :</strong> Transcription temps réel, notes auto, suivi tâches, résumés.</li>
-                            <li><strong>Dans Word :</strong> Aide à la rédaction, réécriture, transformation texte/tableaux, génération de modèles.</li>
-                            <li><strong>Limites pour modèles complexes :</strong> L'action "Populate a Word template" de Power Automate a des restrictions (taille 10Mo, pas de texte enrichi/cases à cocher, etc.).</li>
-                            <li><strong>Copilot Tuning :</strong> Permet d'affiner les LLM avec les données du locataire pour des tâches spécifiques, améliorant pertinence et sécurité.</li>
-                            <li><strong>Prix :</strong> 30 $/utilisateur/mois (engagement annuel) + plan M365 qualifiant.</li>
-                        </ul>
-                        <p class="text-gray-600">Solution puissante pour l'écosystème Microsoft, mais peut nécessiter des outils complémentaires pour des modèles Word très dynamiques.</p>
-                    </div>
-
-                    <div id="plateformes-auto" class="solutions-tab-content hidden space-y-6">
-                        <h3 class="text-2xl font-semibold mb-4">D. Plateformes d'Automatisation de Documents avec Logique Conditionnelle</h3>
-                        <p class="text-gray-600 mb-6">Ces plateformes remplissent des modèles avec des données et gèrent la logique conditionnelle, les tables dynamiques, etc. Elles sont cruciales pour adapter le contenu du compte rendu au modèle prédéfini.</p>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">Plumsail Documents</h4>
-                                <p class="text-sm text-gray-600">Logique conditionnelle avancée (`hide-block-if`, `filter`, `map`, `if`), listes, tableaux. Intégration Power Automate.</p>
-                                <p class="text-sm font-medium text-gray-700 mt-2">Prix: Dès 29 $/mois.</p>
-                            </div>
-                             <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">Conga Composer</h4>
-                                <p class="text-sm text-gray-600">Syntaxe IF de Word, logique booléenne, instructions imbriquées. Fortement lié à Salesforce.</p>
-                                <p class="text-sm font-medium text-gray-700 mt-2">Prix: Personnalisé (entreprise).</p>
-                            </div>
-                            <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">python-docx-template</h4>
-                                <p class="text-sm text-gray-600">Bibliothèque Python avec templating Jinja2. Rendu conditionnel, boucles. Flexibilité maximale.</p>
-                                <p class="text-sm font-medium text-gray-700 mt-2">Prix: Gratuit (open-source).</p>
-                            </div>
-                             <div class="card p-5">
-                                <h4 class="text-xl font-semibold text-blue-700 mb-2">n8n-nodes-docxtemplater</h4>
-                                <p class="text-sm text-gray-600">Nœud pour n8n utilisant `docxtemplater`. Tags, transformations, logique conditionnelle.</p>
-                                <p class="text-sm font-medium text-gray-700 mt-2">Prix: n8n (gratuit auto-hébergé / payant cloud).</p>
-                            </div>
-                        </div>
-                         <div class="mt-8 chart-container">
-                            <canvas id="automationPlatformsChart"></canvas>
-                        </div>
-                        <p class="text-sm text-gray-500 mt-2 text-center">Comparaison des capacités de templating et de la complexité.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="considerations" class="content-section space-y-8">
-                 <div class="bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 class="text-3xl font-bold mb-6">IV. Considérations Clés pour l'Implémentation</h2>
-                    <p class="text-lg text-gray-700 mb-8">Le choix et la mise en œuvre d'une solution d'automatisation impliquent une analyse approfondie de plusieurs facteurs critiques.</p>
-                     <div class="space-y-6">
-                        <div class="card p-6 accordion-item">
-                             <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                Analyse Coût-Bénéfice
-                                <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p>Comparer les coûts (abonnement SaaS, développement personnalisé, matériel pour LLM locaux) avec les bénéfices (gain de temps, réduction erreurs, efficacité accrue).</p>
-                                <p>Les LLM locaux peuvent réduire les coûts récurrents mais demandent un investissement initial en matériel.</p>
-                                <p>Les solutions SaaS ont des coûts d'abonnement mais une maintenance gérée par le fournisseur.</p>
-                            </div>
-                        </div>
-                        <div class="card p-6 accordion-item">
-                             <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                Sécurité et Conformité
-                                 <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p><strong>Protection des Données :</strong> Chiffrement, stockage sécurisé.</p>
-                                <p><strong>Contrôles d'Accès :</strong> Gestion granulaire des permissions.</p>
-                                <p><strong>Pistes d'Audit :</strong> Suivi détaillé des modifications.</p>
-                                <p><strong>Conformité Réglementaire :</strong> (ex: RGPD). Les LLM locaux comme LM Studio offrent un avantage ici.</p>
-                            </div>
-                        </div>
-                        <div class="card p-6 accordion-item">
-                            <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                Évolutivité et Performance
-                                 <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p>La solution doit gérer des volumes croissants de données et de comptes rendus sans dégradation. La performance (vitesse de génération) est clé.</p>
-                                <p>Les LLM locaux dépendent du matériel ; les solutions cloud offrent une mise à l'échelle plus automatique.</p>
-                            </div>
-                        </div>
-                        <div class="card p-6 accordion-item">
-                            <button class="w-full text-left accordion-header">
-                                <h3 class="text-2xl font-semibold mb-3 flex justify-between items-center">
-                                Maintenance et Gestion des Modèles
-                                 <span class="text-blue-500 text-2xl transform transition-transform duration-300">+</span>
-                                </h3>
-                            </button>
-                            <div class="accordion-content text-gray-600 space-y-3">
-                                <p><strong>Standardisation :</strong> Normes pour la documentation et le formatage.</p>
-                                <p><strong>Contrôle de Version :</strong> Suivi des modifications des modèles.</p>
-                                <p><strong>Mises à Jour :</strong> Adaptation aux changements légaux/commerciaux.</p>
-                                <p><strong>Formation des Utilisateurs :</strong> Essentielle pour une utilisation efficace.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="conclusion" class="content-section space-y-6">
-                <div class="bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 class="text-3xl font-bold mb-6">V. Conclusion et Recommandations Actionnables</h2>
-                    <p class="text-lg text-gray-700 mb-8">
-                        L'automatisation de la rédaction de comptes rendus structurés à partir de notes non structurées est une démarche stratégique. Le succès repose sur une combinaison judicieuse de technologies et une approche progressive.
-                    </p>
-                    <div class="bg-blue-50 p-6 rounded-lg shadow-inner border-l-4 border-blue-500">
-                        <h3 class="text-xl font-semibold text-blue-700 mb-4">Recommandations Clés du Rapport :</h3>
-                        <ul class="list-decimal list-inside space-y-3 text-gray-700">
-                            <li>
-                                <strong>Évaluation des Besoins et des Données :</strong> Analyser la nature des notes (format, structure, volume, sensibilité) et les exigences du modèle de compte rendu.
-                            </li>
-                            <li>
-                                <strong>Priorisation de la Confidentialité :</strong> Si les notes sont sensibles, explorer des LLM locaux (LM Studio). Prévoir matériel et expertise.
-                            </li>
-                            <li>
-                                <strong>Exploitation de l'Écosystème Existant :</strong> Microsoft Copilot est un bon point de départ pour l'écosystème M365, mais peut nécessiter des compléments pour des modèles complexes.
-                            </li>
-                            <li>
-                                <strong>Adoption de Plateformes Spécialisées pour la Complexité :</strong> Pour une logique conditionnelle avancée et des tableaux dynamiques, privilégier des plateformes d'automatisation de documents dédiées (SaaS ou bibliothèques Python).
-                            </li>
-                            <li>
-                                <strong>Mise en Place d'une Gouvernance Robuste :</strong> Sécurité, contrôles d'accès, pistes d'audit.
-                            </li>
-                            <li>
-                                <strong>Gestion du Changement et Formation :</strong> Impliquer les parties prenantes et former les équipes.
-                            </li>
-                        </ul>
-                    </div>
-                     <p class="text-md text-gray-600 mt-6">
-                        En conclusion, les outils d'IA dédiés aux réunions et les LLM locaux sont prometteurs pour l'extraction et la synthèse. Pour la génération à partir de modèles complexes, les plateformes d'automatisation de documents ou le développement personnalisé avec des bibliothèques Python sont les plus adaptés. Une validation humaine reste cruciale.
-                    </p>
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-<script>
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    const contentSections = document.querySelectorAll('.content-section');
-    const solutionsTabButtons = document.querySelectorAll('.solutions-tab-button');
-    const solutionsTabContents = document.querySelectorAll('.solutions-tab-content');
-    const accordionItems = document.querySelectorAll('.accordion-item');
-    let llmChartInstance = null;
-    let iaToolsChartInstance = null;
-    let automationPlatformsChartInstance = null;
-
-    function navigateToSection(hash) {
-        sidebarLinks.forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === hash);
-        });
-        contentSections.forEach(section => {
-            section.classList.toggle('active', '#' + section.id === hash);
-             section.classList.toggle('hidden', '#' + section.id !== hash);
-        });
-        window.scrollTo(0,0);
-        
-        if (hash === '#fondamentaux') {
-            setTimeout(createLlmComparisonChart, 0); // Ensure DOM is ready
-        }
-        if (hash === '#solutions') {
-             const activeTabButton = document.querySelector('.solutions-tab-button.active');
-             if (activeTabButton) {
-                const tabId = activeTabButton.dataset.tab;
-                if (tabId === 'outils-ia') setTimeout(createIaToolsChart, 0);
-                if (tabId === 'plateformes-auto') setTimeout(createAutomationPlatformsChart, 0);
-             } else { // Default to first tab if none active
-                const firstTabButton = document.querySelector('.solutions-tab-button[data-tab="outils-ia"]');
-                if (firstTabButton) {
-                    firstTabButton.click(); // This will trigger chart creation if needed
+            function getPriorityClass(priority) {
+                switch (priority) {
+                    case 'Très Haute': return 'tag-red';
+                    case 'Haute': return 'tag-orange';
+                    case 'Moyenne': return 'tag-blue';
+                    default: return 'bg-gray-200 text-gray-800';
                 }
-             }
-        }
-    }
-    
-    sidebarLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href');
-            navigateToSection(targetId);
-            history.pushState(null, null, targetId);
-        });
-    });
+            }
 
-    accordionItems.forEach(item => {
-        const header = item.querySelector('.accordion-header');
-        const content = item.querySelector('.accordion-content');
-        const icon = header.querySelector('span');
+            function getCategoryClass(category) {
+                 switch (category) {
+                    case 'Audit': return 'bg-red-100 text-red-800';
+                    case 'Gestion': return 'bg-yellow-100 text-yellow-800';
+                    case 'Analyse': return 'bg-purple-100 text-purple-800';
+                    case 'Étude': return 'bg-green-100 text-green-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            }
 
-        header.addEventListener('click', () => {
-            const isOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
+            function renderGrid(filter = 'all') {
+                grid.innerHTML = '';
+                const filteredData = (filter === 'all') ? processData : processData.filter(p => p.category.startsWith(filter.substring(0,5)));
+
+                filteredData.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'card bg-white p-6 rounded-xl shadow-md cursor-pointer';
+                    card.dataset.id = p.id;
+                    card.innerHTML = `
+                        <h3 class="font-bold text-lg text-gray-800 mb-2">${p.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 h-10">${p.desc}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="tag ${getCategoryClass(p.category)}">${p.category}</span>
+                            <span class="tag ${getPriorityClass(p.priority)}">Priorité ${p.priority}</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => showDetail(p.id));
+                    grid.appendChild(card);
+                });
+            }
+
+            function showDetail(id) {
+                const process = processData.find(p => p.id === id);
+                if (!process) return;
+
+                document.getElementById('detail-title').textContent = process.title;
+                document.getElementById('detail-description').textContent = process.desc;
+                
+                const categorySpan = document.getElementById('detail-category');
+                categorySpan.textContent = process.category;
+                categorySpan.className = `tag ${getCategoryClass(process.category)}`;
+
+                const prioritySpan = document.getElementById('detail-priority');
+                prioritySpan.textContent = `Priorité ${process.priority}`;
+                prioritySpan.className = `tag ${getPriorityClass(process.priority)}`;
+
+                const workflowList = document.getElementById('detail-workflow');
+                workflowList.innerHTML = process.workflow.map((step, index) => `
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center mr-3" style="background-color: var(--primary-color);">${index + 1}</span>
+                        <span>${step}</span>
+                    </li>
+                `).join('');
+
+                const painpointsList = document.getElementById('detail-painpoints');
+                painpointsList.innerHTML = process.painPoints.map(pp => `<li>${pp}</li>`).join('');
+
+                detailView.classList.remove('hidden');
+                detailView.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            closeDetailBtn.addEventListener('click', () => {
+                detailView.classList.add('hidden');
+            });
             
-            // Close all other accordions in the same section before opening current one
-            // This is optional, remove if you want multiple accordions open
-            const parentSection = item.closest('.space-y-6, .space-y-8');
-            if (parentSection) {
-                 parentSection.querySelectorAll('.accordion-item').forEach(otherItem => {
-                    if (otherItem !== item) {
-                        otherItem.querySelector('.accordion-content').style.maxHeight = null;
-                        const otherIcon = otherItem.querySelector('.accordion-header span');
-                        if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
-                         otherItem.querySelector('.accordion-header').classList.remove('bg-blue-50');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.style.backgroundColor = '#E5E7EB'; // gray-200
+                        btn.style.color = '#374151'; // gray-800
+                    });
+                    button.classList.add('active');
+                    button.style.backgroundColor = 'var(--secondary-color)';
+                    button.style.color = 'white';
+                    renderGrid(button.dataset.filter);
+                     if (!detailView.classList.contains('hidden')) {
+                        detailView.classList.add('hidden');
+                    }
+                });
+            });
+
+            renderGrid();
+
+            const priorityCounts = processData.reduce((acc, p) => {
+                acc[p.priority] = (acc[p.priority] || 0) + 1;
+                return acc;
+            }, {});
+
+            const priorityChartCtx = document.getElementById('priorityChart').getContext('2d');
+            new Chart(priorityChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(priorityCounts),
+                    datasets: [{
+                        data: Object.values(priorityCounts),
+                        backgroundColor: ['#DC2626', '#F59E0B', '#3B82F6'],
+                        borderColor: '#F9FAFB',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' processus';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const painPointCounts = processData.flatMap(p => p.painPoints).reduce((acc, pp) => {
+                acc[pp] = (acc[pp] || 0) + 1;
+                return acc;
+            }, {});
+
+            const painPointChartCtx = document.getElementById('painPointChart').getContext('2d');
+            new Chart(painPointChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(painPointCounts),
+                    datasets: [{
+                        label: 'Nombre de processus affectés',
+                        data: Object.values(painPointCounts),
+                        backgroundColor: 'rgba(0, 169, 157, 0.7)',
+                        borderColor: 'rgba(0, 169, 157, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                     scales: {
+                        x: {
+                            beginAtZero: true,
+                             ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            const tableContainer = document.getElementById('interactive-table-container');
+            const similarityData = {
+                labels: ["I. Audit", "II. Transfert", "III. RPQS", "IV. Suivi COPIL", "VIII. Suivi Début", "IX. RAO", "X. Audit Tech.", "XI/XII. Chiffrage"],
+                matrix: [
+                    [1.00, 0.29, 0.57, 0.86, 0.86, 0.43, 0.71, 0.29],
+                    [0.29, 1.00, 0.43, 0.29, 0.29, 0.43, 0.43, 0.57],
+                    [0.57, 0.43, 1.00, 0.57, 0.57, 0.71, 0.43, 0.43],
+                    [0.86, 0.29, 0.57, 1.00, 1.00, 0.57, 0.71, 0.29],
+                    [0.86, 0.29, 0.57, 1.00, 1.00, 0.57, 0.71, 0.29],
+                    [0.43, 0.43, 0.71, 0.57, 0.57, 1.00, 0.43, 0.57],
+                    [0.71, 0.43, 0.43, 0.71, 0.71, 0.43, 1.00, 0.43],
+                    [0.29, 0.57, 0.43, 0.29, 0.29, 0.57, 0.43, 1.00]
+                ]
+            };
+
+            function createInteractiveTable() {
+                tableContainer.innerHTML = '';
+                const table = document.createElement('table');
+                table.className = 'interactive-table';
+
+                const thead = table.createTHead();
+                const headerRow = thead.insertRow();
+                const emptyTh = document.createElement('th');
+                headerRow.appendChild(emptyTh);
+                
+                similarityData.labels.forEach((label, i) => {
+                    const th = document.createElement('th');
+                    th.className = 'col-header';
+                    th.id = `col-header-${i}`;
+                    th.textContent = label.replace(/ *\([^)]*\) */g, "");
+                    headerRow.appendChild(th);
+                });
+
+                const tbody = table.createTBody();
+                similarityData.matrix.forEach((row, i) => {
+                    const tr = tbody.insertRow();
+                    const rowHeader = document.createElement('th');
+                    rowHeader.id = `row-header-${i}`;
+                    rowHeader.textContent = similarityData.labels[i].replace(/ *\([^)]*\) */g, "");
+                    tr.appendChild(rowHeader);
+                    
+                    row.forEach((value, j) => {
+                        const td = tr.insertCell();
+                        td.dataset.rowIndex = i;
+                        td.dataset.colIndex = j;
+                        
+                        const primaryColor = '0, 169, 157'; // Teal
+                        td.style.backgroundColor = `rgba(${primaryColor}, ${value * 0.8})`;
+                        td.innerHTML = `<span class="tooltip">${Math.round(value * 100)}%</span>`;
+                    });
+                });
+
+                tableContainer.appendChild(table);
+
+                tbody.addEventListener('mouseover', (e) => {
+                    if (e.target.tagName === 'TD') {
+                        const rowIndex = e.target.dataset.rowIndex;
+                        const colIndex = e.target.dataset.colIndex;
+                        document.getElementById(`row-header-${rowIndex}`).classList.add('highlight-strong');
+                        document.getElementById(`col-header-${colIndex}`).classList.add('highlight-strong');
+                        e.target.classList.add('highlight-weak');
+                    }
+                });
+
+                tbody.addEventListener('mouseout', (e) => {
+                    if (e.target.tagName === 'TD') {
+                        const rowIndex = e.target.dataset.rowIndex;
+                        const colIndex = e.target.dataset.colIndex;
+                        document.getElementById(`row-header-${rowIndex}`).classList.remove('highlight-strong');
+                        document.getElementById(`col-header-${colIndex}`).classList.remove('highlight-strong');
+                        e.target.classList.remove('highlight-weak');
                     }
                 });
             }
             
-            if (isOpen) {
-                content.style.maxHeight = null;
-                if(icon) icon.style.transform = 'rotate(0deg)';
-                header.classList.remove('bg-blue-50');
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-                if(icon) icon.style.transform = 'rotate(45deg)';
-                header.classList.add('bg-blue-50');
+            createInteractiveTable();
+
+            // --- Solution Simulation Logic ---
+            const startBtn = document.getElementById('start-simulation');
+            const selector = document.getElementById('process-selector');
+            const canvas = document.getElementById('solution-canvas');
+            const ctx = canvas.getContext('2d');
+            const modal = document.getElementById('agent-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            const agentData = {
+                0: { title: "Agent Collecte", desc: "Récupère les documents sources depuis divers canaux (emails, dossiers, API). C'est le point d'entrée du système.", nodes: "Webhook, IMAP Email, Read Binary File, FTP, HTTP Request." },
+                1: { title: "Agent Vérification", desc: "Assure la qualité et la conformité des documents. Il peut classifier les fichiers, vérifier leur lisibilité et s'assurer que toutes les pièces requises sont présentes.", nodes: "IF, Switch, HTTP Request vers une IA de classification, Function (code personnalisé)." },
+                2: { title: "Agent Structuration", desc: "Remplace la saisie manuelle. Il utilise l'IA pour extraire les données pertinentes (texte, tableaux, chiffres) et les transforme en format structuré (JSON) pour un usage ultérieur.", nodes: "HTTP Request vers Azure AI / Google Vision, Function, Base de données (Postgres, etc.)." },
+                3: { title: "Agent Rédaction", desc: "Génère automatiquement les documents textuels comme les rapports ou les synthèses à partir de modèles Word pré-établis et des données structurées.", nodes: "Function (avec librairies type docxtemplater), HTTP Request vers une API de génération." },
+                4: { title: "Agent Présentation", desc: "Crée les supports de présentation PowerPoint en peuplant dynamiquement des modèles avec des chiffres clés, des graphiques et des résumés.", nodes: "Function (avec librairies type pptxgenjs), Move/Write Binary File." },
+                5: { title: "Agent Communication", desc: "Diffuse les livrables finaux, envoie des notifications de fin de processus et archive les documents aux emplacements appropriés.", nodes: "Send Email, Microsoft Teams, Slack, SharePoint." }
+            };
+
+            const processPaths = {
+                'rao': [0, 1, 2, 3, 4, 5],
+                'suivi_contrat': [0, 2, 3, 5],
+                'rpqs': [0, 2, 3, 4, 5]
+            };
+
+            let currentPath = [];
+            let currentStep = 0;
+
+            function resetSimulation() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                document.querySelectorAll('.agent-node').forEach(node => {
+                    node.classList.remove('active', 'clickable');
+                });
+                const existingBtn = document.querySelector('#solution-container button');
+                if (existingBtn) existingBtn.remove();
+                currentStep = 0;
             }
-        });
-    });
-
-    solutionsTabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabId = button.dataset.tab;
-
-            solutionsTabButtons.forEach(btn => {
-                btn.classList.remove('active', 'text-blue-600', 'font-semibold', 'border-blue-500');
-                btn.classList.add('text-gray-500', 'hover:text-blue-600', 'border-transparent');
-            });
-            button.classList.add('active', 'text-blue-600', 'font-semibold', 'border-blue-500');
-            button.classList.remove('text-gray-500', 'hover:text-blue-600', 'border-transparent');
-
-
-            solutionsTabContents.forEach(content => {
-                content.classList.toggle('active', content.id === tabId);
-                content.classList.toggle('hidden', content.id !== tabId);
-            });
             
-            if (tabId === 'outils-ia') setTimeout(createIaToolsChart, 0);
-            if (tabId === 'plateformes-auto') setTimeout(createAutomationPlatformsChart, 0);
-        });
-    });
-    
-    const initialHash = window.location.hash || '#accueil';
-    navigateToSection(initialHash);
-     if (initialHash === '#solutions') {
-        const firstTabButton = document.querySelector('.solutions-tab-button[data-tab="outils-ia"]');
-        if (firstTabButton && !firstTabButton.classList.contains('active')) {
-             firstTabButton.click();
-        } else if (firstTabButton && firstTabButton.classList.contains('active')) {
-            // If already active, ensure chart is drawn
-            setTimeout(createIaToolsChart, 0);
-        }
-    }
+            startBtn.addEventListener('click', () => {
+                resetSimulation();
+                currentPath = processPaths[selector.value];
+                activateAgent(currentPath[0]);
+            });
 
-
-    function wrapLabels(label, maxWidth) {
-        const words = label.split(' ');
-        let line = '';
-        const lines = [];
-        for (let i = 0; i < words.length; i++) {
-            const testLine = line + words[i] + ' ';
-            if (testLine.length > maxWidth && i > 0) {
-                lines.push(line.trim());
-                line = words[i] + ' ';
-            } else {
-                line = testLine;
-            }
-        }
-        lines.push(line.trim());
-        return lines;
-    }
-
-    const commonChartOptions = (titleText, yLabel = '', suggestedMaxY) => ({
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            title: { display: true, text: titleText, font: { size: 16, weight: '600' }, color: '#1E40AF', padding: { top: 10, bottom: 20 } },
-            legend: { position: 'top', labels: { font: { size: 12 }, color: '#4B5563'} },
-            tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.85)',
-                titleFont: { size: 14, weight: 'bold' },
-                bodyFont: { size: 12 },
-                callbacks: {
-                    label: function(context) {
-                        let label = context.dataset.label || '';
-                        if (label) { label += ': '; }
-                        if (context.parsed.y !== null) { label += context.parsed.y + (yLabel ? ' ' + yLabel : ''); }
-                        return label;
-                    }
+            function activateAgent(agentId) {
+                const node = document.getElementById(`agent-${agentId}`);
+                if (node) {
+                    node.classList.add('active', 'clickable');
+                    node.onclick = () => showAgentDetails(agentId);
                 }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                suggestedMax: suggestedMaxY,
-                title: { display: !!yLabel, text: yLabel, font: {size: 12}, color: '#4B5563' },
-                ticks: { font: { size: 11 }, color: '#6B7280' }
-            },
-            x: {
-                ticks: { 
-                    font: { size: 11 }, color: '#6B7280',
-                    callback: function(value) { return wrapLabels(this.getLabelForValue(value), 10); }
-                }
-            }
-        }
-    });
-    
-    const radarChartOptions = (titleText) => ({
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            title: { display: true, text: titleText, font: { size: 16, weight: '600' }, color: '#1E40AF', padding: {top: 10, bottom: 20} },
-            legend: { position: 'top', labels: { font: { size: 12 }, color: '#4B5563'} },
-             tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return `${context.dataset.label}: ${context.raw}`;
-                    }
-                }
-            }
-        },
-        scales: {
-            r: {
-                angleLines: { display: true, color: '#D1D5DB' },
-                suggestedMin: 0,
-                suggestedMax: 3, 
-                pointLabels: { font: { size: 10 }, color: '#4B5563', callback: function(value) { return wrapLabels(value, 12); } },
-                ticks: { stepSize: 1, backdropColor: 'transparent', color: '#6B7280' },
-                grid: { color: '#E5E7EB' }
-            }
-        },
-        elements: { line: { borderWidth: 2 }, point: { radius: 3, hoverRadius: 5 } }
-    });
 
-    function createLlmComparisonChart() {
-        if (llmChartInstance) llmChartInstance.destroy();
-        const ctx = document.getElementById('llmComparisonChart')?.getContext('2d');
-        if (!ctx) return;
-        llmChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Temps de config.', 'Coût long terme', 'Contrôle données', 'Confidentialité', 'Performance', 'Évolutivité', 'Accès hors ligne'],
-                datasets: [
-                    {
-                        label: 'LLM Local (ex: LM Studio)',
-                        data: [2, 1, 3, 3, 2, 1, 3], // Scores: 1=Faible/Mauvais, 2=Moyen, 3=Élevé/Bon
-                        backgroundColor: 'rgba(96, 165, 250, 0.7)', // Muted Blue
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'LLM Cloud (Générique)',
-                        data: [3, 1, 1, 1, 2.5, 3, 1],
-                        backgroundColor: 'rgba(167, 139, 250, 0.7)', // Muted Purple
-                        borderColor: 'rgba(139, 92, 246, 1)',
-                        borderWidth: 1
+                if (currentStep > 0) {
+                    const prevAgentId = currentPath[currentStep - 1];
+                    const prevNode = document.getElementById(`agent-${prevAgentId}`);
+                    if (prevNode) {
+                       prevNode.onclick = () => showAgentDetails(prevAgentId); // Keep previous nodes clickable
+                       animatePath(prevNode, node, () => {
+                           if (currentStep < currentPath.length - 1) {
+                               const nextBtn = document.createElement('button');
+                               nextBtn.innerHTML = `Suivant &rarr;`;
+                               nextBtn.className = 'absolute bottom-4 right-4 text-white font-bold py-2 px-4 rounded-lg transition-colors z-10';
+                               nextBtn.style.backgroundColor = 'var(--primary-color)';
+                               nextBtn.onclick = () => {
+                                   currentStep++;
+                                   activateAgent(currentPath[currentStep]);
+                                   nextBtn.remove();
+                               };
+                               // Quick hack to prevent multiple buttons
+                               const existingBtn = document.querySelector('#solution-container button');
+                               if (existingBtn) existingBtn.remove();
+                               document.getElementById('solution-container').appendChild(nextBtn);
+                           }
+                       });
                     }
-                ]
-            },
-            options: commonChartOptions('LLM Local vs. Cloud (Scores Relatifs)', 'Score Relatif (1-3)', 3)
-        });
-    }
-
-    function createIaToolsChart() {
-        if (iaToolsChartInstance) iaToolsChartInstance.destroy();
-        const ctx = document.getElementById('iaToolsChart')?.getContext('2d');
-        if (!ctx) return;
-
-        iaToolsChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Otter.ai', 'Leexi', 'Noota', 'Fireflies.ai', 'ClickUp'],
-                datasets: [
-                    {
-                        label: 'Précision Transcription (estimée)', // Qualitative: 1=OK, 2=Bonne, 3=Très Bonne
-                        data: [2.5, 3, 3, 2, 2],
-                        backgroundColor: 'rgba(52, 211, 153, 0.7)', // Emerald
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Personnalisation Résumé (estimée)',
-                        data: [2, 3, 3, 1.5, 2],
-                        backgroundColor: 'rgba(251, 146, 60, 0.7)', // Orange
-                        borderColor: 'rgba(249, 115, 22, 1)',
-                        borderWidth: 1
-                    },
-                     {
-                        label: 'Intégrations (estimées)',
-                        data: [2.5, 2, 3, 2.5, 2],
-                        backgroundColor: 'rgba(129, 140, 248, 0.7)', // Indigo light
-                        borderColor: 'rgba(101, 116, 205, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: commonChartOptions('Comparaison Outils IA Dédiés (Scores Qualitatifs Relatifs)', 'Score (1-3)', 3)
-        });
-    }
-    
-    function createAutomationPlatformsChart() {
-        if (automationPlatformsChartInstance) automationPlatformsChartInstance.destroy();
-        const ctx = document.getElementById('automationPlatformsChart')?.getContext('2d');
-        if (!ctx) return;
-        // Scores: 1=Basique/Limité, 2=Bon, 3=Avancé/Excellent
-        automationPlatformsChartInstance = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: ['Logique Conditionnelle', 'Tableaux Dynamiques', 'Intégration Word', 'Facilité Modèle', 'Coût (Relatif Bas=3)'],
-                datasets: [
-                    {
-                        label: 'Plumsail Docs',
-                        data: [3, 3, 2.5, 2.5, 2.5],
-                        borderColor: 'rgba(239, 68, 68, 1)', // Red
-                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                        pointBackgroundColor: 'rgba(239, 68, 68, 1)',
-                    },
-                    {
-                        label: 'Conga Composer',
-                        data: [3, 3, 3, 2, 1],
-                        borderColor: 'rgba(245, 158, 11, 1)', // Amber
-                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                        pointBackgroundColor: 'rgba(245, 158, 11, 1)',
-                    },
-                    {
-                        label: 'python-docx-template',
-                        data: [3, 3, 3, 1.5, 3], // Coût bas si expertise interne
-                        borderColor: 'rgba(34, 197, 94, 1)', // Green
-                        backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                        pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                    },
-                     {
-                        label: 'Power Automate (Word)',
-                        data: [1, 1, 2, 2, 2.5], // Limité pour logique complexe
-                        borderColor: 'rgba(14, 165, 233, 1)', // Sky
-                        backgroundColor: 'rgba(14, 165, 233, 0.2)',
-                        pointBackgroundColor: 'rgba(14, 165, 233, 1)',
-                    }
-                ]
-            },
-            options: radarChartOptions('Comparaison Plateformes Automatisation Documentaire')
-        });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const currentHash = window.location.hash || '#accueil';
-        navigateToSection(currentHash);
-        
-        // Special handling for #solutions to ensure the first tab is active and its chart is drawn
-        if (currentHash === '#solutions') {
-            const firstTabButton = document.querySelector('.solutions-tab-button[data-tab="outils-ia"]');
-            if (firstTabButton) {
-                // If not already active by navigateToSection, click it.
-                // navigateToSection might have already set it active if hash was #solutions
-                if (!firstTabButton.classList.contains('active')) {
-                     firstTabButton.click(); // This will trigger tab switch and chart
                 } else {
-                    // If it was already set active, ensure chart is drawn
-                     setTimeout(createIaToolsChart, 0);
+                     if (currentStep < currentPath.length - 1) {
+                           const nextBtn = document.createElement('button');
+                           nextBtn.innerHTML = `Suivant &rarr;`;
+                           nextBtn.className = 'absolute bottom-4 right-4 text-white font-bold py-2 px-4 rounded-lg transition-colors z-10';
+                           nextBtn.style.backgroundColor = 'var(--primary-color)';
+                           nextBtn.onclick = () => {
+                               currentStep++;
+                               activateAgent(currentPath[currentStep]);
+                               nextBtn.remove();
+                           };
+                           const existingBtn = document.querySelector('#solution-container button');
+                           if (existingBtn) existingBtn.remove();
+                           document.getElementById('solution-container').appendChild(nextBtn);
+                       }
                 }
             }
-        }
-    });
+            
+            function showAgentDetails(agentId) {
+                const data = agentData[agentId];
+                document.getElementById('modal-title').innerText = data.title;
+                document.getElementById('modal-description').innerText = data.desc;
+                document.getElementById('modal-nodes').innerText = data.nodes;
+                modal.style.display = 'flex';
+            }
+            
+            closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
 
-</script>
+            function animatePath(startNode, endNode, callback) {
+                const containerRect = canvas.parentElement.getBoundingClientRect();
+                const startRect = startNode.getBoundingClientRect();
+                const endRect = endNode.getBoundingClientRect();
+
+                const startX = startRect.left + startRect.width / 2 - containerRect.left;
+                const startY = startRect.top + startRect.height / 2 - containerRect.top;
+                const endX = endRect.left + endRect.width / 2 - containerRect.left;
+                const endY = endRect.top + endRect.height / 2 - containerRect.top;
+                
+                let progress = 0;
+                const duration = 500; // ms
+
+                function draw(timestamp) {
+                    if (!lastTimestamp) lastTimestamp = timestamp;
+                    progress += timestamp - lastTimestamp;
+                    lastTimestamp = timestamp;
+                    let t = Math.min(progress / duration, 1);
+
+                    const currentX = startX + (endX - startX) * t;
+                    const currentY = startY + (endY - startY) * t;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(currentX, currentY);
+                    ctx.strokeStyle = 'var(--secondary-color)';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    
+                    if (t < 1) {
+                        requestAnimationFrame(draw);
+                    } else {
+                        if (callback) callback();
+                    }
+                }
+                
+                let lastTimestamp;
+                requestAnimationFrame(draw);
+            }
+            
+             function resizeCanvas() {
+                const container = document.getElementById('solution-container');
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                resetSimulation();
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+        });
+    </script>
+
 </body>
 </html>
