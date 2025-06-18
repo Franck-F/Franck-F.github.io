@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: "Bert Consultant" - Un fond blanc cassé avec le bleu sarcelle (#00A99D) et le violet foncé (#3F2A56) du logo comme couleurs primaires et secondaires. -->
     <!-- Application Structure Plan: L'application est conçue comme un tableau de bord stratégique en 4 sections, guidant l'utilisateur de la problématique à la solution. 1) 'Diagnostic' expose le flux de travail inefficace actuel. 2) 'Explorateur de Processus' permet une immersion interactive dans chaque processus via des cartes filtrables. 3) 'Analyse des Frictions' agrège et visualise les problèmes récurrents et les synergies entre processus pour en souligner l'impact systémique. 4) 'La Solution IA' présente l'architecture d'agents IA proposée de manière visuelle et compréhensible. Cette structure non-linéaire transforme le rapport statique en un outil d'exploration et de prise de décision. -->
-    <!-- Visualization & Content Choices: 1. Diagnostic (Flux actuel): Diagramme HTML/CSS simple (Goal: Informer). 2. Priorités d'Automatisation: Graphique en anneau Chart.js (Goal: Comparer). 3. Frictions Systémiques: Graphique à barres Chart.js (Goal: Analyser). 4. Matrice de Similitude: Tableau interactif (HTML Table) avec coloration de type heatmap et mise en évidence au survol pour explorer les synergies (Goal: Explorer & Analyser). 5. Architecture de la Solution: Simulation de flux de travail interactive pour démontrer le système d'agents MCP (Goal: Expliquer & Engager). -->
+    <!-- Visualization & Content Choices: 1. Diagnostic (Flux actuel): Diagramme HTML/CSS simple (Goal: Informer). 2. Priorités d'Automatisation: Graphique en anneau Chart.js avec légende HTML détaillée (Goal: Comparer & Informer). 3. Frictions Systémiques: Diagramme à bulles Chart.js pour montrer la fréquence et l'impact (Goal: Analyser & Prioriser). 4. Matrice de Similitude: Tableau interactif (HTML Table) avec coloration de type heatmap (Goal: Explorer & Analyser). 5. Architecture de la Solution: Simulation de flux de travail interactive pour démontrer le système d'agents MCP (Goal: Expliquer & Engager). -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -157,13 +157,86 @@
             visibility: visible;
             opacity: 1;
         }
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .workflow-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .workflow-icon-container {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .workflow-arrow {
+            text-align: center;
+            color: #D1D5DB; /* gray-300 */
+            font-size: 1.5rem;
+            height: 2rem;
+            opacity: 0;
+            transition: opacity 0.4s ease 0.2s;
+        }
+        .workflow-arrow.visible {
+            opacity: 1;
+        }
+        /* Animated Icons CSS */
+        .icon-scan {
+            width: 24px; height: 28px; background-color: #A7F3D0; border: 2px solid var(--primary-color); border-radius: 2px; position: relative; overflow: hidden;
+        }
+        .icon-scan::before {
+            content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 2px; background-color: var(--primary-color); animation: scan 1.5s ease-in-out infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 26px; }
+            100% { top: 0; }
+        }
+        .icon-check {
+            width: 28px; height: 28px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-check .checkmark-stem { width: 3px; height: 0; background-color: var(--primary-color); transform: rotate(45deg); transition: height 0.2s ease-out 0.3s; }
+        .icon-check .checkmark-kick { width: 0; height: 3px; background-color: var(--primary-color); transform: rotate(45deg); transition: width 0.2s ease-out; }
+        .visible .icon-check .checkmark-stem { height: 14px; }
+        .visible .icon-check .checkmark-kick { width: 8px; transform: translate(-1px, -1px) rotate(45deg); }
+        .icon-write {
+            width: 24px; height: 28px; background-color: #FEF3C7; border: 2px solid #FBBF24; border-radius: 2px; position: relative;
+        }
+        .icon-write::before { content: ''; position: absolute; top: 8px; left: 4px; width: 2px; height: 12px; background: #FBBF24; animation: typing 1s infinite; }
+        @keyframes typing {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .icon-grid {
+            width: 24px; height: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+        }
+        .icon-grid .cell { background-color: #E0E7FF; transition: background-color 0.2s; }
+        .visible .icon-grid .cell:nth-child(1) { transition-delay: 0.1s; background-color: #6366F1; }
+        .visible .icon-grid .cell:nth-child(2) { transition-delay: 0.2s; background-color: #6366F1; }
+        .visible .icon-grid .cell:nth-child(3) { transition-delay: 0.3s; background-color: #6366F1; }
+        .visible .icon-grid .cell:nth-child(4) { transition-delay: 0.4s; background-color: #6366F1; }
+        .icon-graph {
+            width: 28px; height: 24px; display: flex; align-items: flex-end; justify-content: space-around;
+        }
+        .icon-graph .bar { background-color: var(--secondary-color); width: 6px; height: 0; transition: height 0.4s ease-in-out; }
+        .visible .icon-graph .bar:nth-child(1) { height: 60%; transition-delay: 0.1s; }
+        .visible .icon-graph .bar:nth-child(2) { height: 90%; transition-delay: 0.2s; }
+        .visible .icon-graph .bar:nth-child(3) { height: 40%; transition-delay: 0.3s; }
     </style>
 </head>
 <body class="antialiased">
 
     <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <img src="https://storage.googleapis.com/contextual_user_image_795326555/logo-bert-consultant-xs.jpg" alt="Logo Bert Consultant" class="h-12">
+            <img src="logo-bert-consultant-xs.jpg" alt="Logo Bert Consultant" class="h-12">
             <ul class="flex space-x-8">
                 <li><a href="#diagnostic" class="nav-link text-gray-600 hover:text-gray-900">Diagnostic</a></li>
                 <li><a href="#explorer" class="nav-link text-gray-600 hover:text-gray-900">Explorateur</a></li>
@@ -231,8 +304,8 @@
                 <p id="detail-description" class="text-gray-600 mb-6"></p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h4 class="font-semibold text-lg mb-3 text-gray-800">Flux de Travail :</h4>
-                        <ul id="detail-workflow" class="list-none space-y-3"></ul>
+                        <h4 class="font-semibold text-lg mb-3 text-gray-800">Flux de Travail Animé :</h4>
+                        <div id="detail-workflow" class="space-y-2"></div>
                     </div>
                     <div>
                         <h4 class="font-semibold text-lg mb-3 text-gray-800">Points de Friction :</h4>
@@ -247,15 +320,17 @@
             <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12 text-center">
                 Les problèmes ne sont pas isolés. Cette analyse agrégée révèle des points de friction systémiques et des synergies fortes entre processus, justifiant une approche de solution centralisée et réutilisable.
             </p>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-16 items-start">
                 <div class="w-full">
                     <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Priorités d'Automatisation</h3>
                     <div class="chart-container">
                         <canvas id="priorityChart"></canvas>
                     </div>
+                    <div id="priority-legend" class="mt-4 px-2"></div>
                 </div>
                 <div class="w-full">
-                    <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Frictions les Plus Courantes</h3>
+                    <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Analyse des Frictions Courantes</h3>
+                    <p class="text-sm text-center text-gray-500 mb-4 -mt-2">La taille des bulles indique la fréquence ; la hauteur indique l'impact.</p>
                      <div class="chart-container" style="max-width: 600px; height: 350px;">
                         <canvas id="painPointChart"></canvas>
                     </div>
@@ -356,13 +431,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             
             const processData = [
-                { id: 1, title: "I. Audit de reversement", category: "Audit", priority: "Moyenne", desc: "Contrôle de la conformité des données transmises en fin de contrat.", workflow: ["Collecte des documents (contrats, rapports)", "Vérification et contrôle qualité", "Saisie et structuration des données", "Rédaction du rapport de contrôle"], painPoints: ["Extraction manuelle de données", "Risque d'erreurs dans le rapport"] },
-                { id: 2, title: "II. Transfert de compétence", category: "Étude", priority: "Haute", desc: "État des lieux complet lors d'un transfert de compétence entre entités.", workflow: ["Collecte de documents souvent volumineux", "Mise à jour manuelle des fichiers Excel", "Tâches de consolidation diverses", "Rédaction des rapports et présentations"], painPoints: ["Qualité médiocre des scans", "Processus très chronophage", "Risque élevé d'erreurs de transcription"] },
-                { id: 3, title: "IV. Suivi de Contrat COPIL", category: "Gestion", priority: "Haute", desc: "Suivi régulier des obligations contractuelles pour les comités de pilotage.", workflow: ["Lecture manuelle de contrats longs", "Saisie des échéances dans une grille Excel", "Calcul manuel des pénalités", "Préparation de l'ordre du jour"], painPoints: ["Charge de travail importante", "Risque d'erreurs financières", "Manque de réactivité"] },
-                { id: 4, title: "IX. Analyse des Offres (RAO)", category: "Analyse", priority: "Très Haute", desc: "Analyse comparative complexe d'offres dans le cadre d'appels d'offres.", workflow: ["Lecture et analyse de toutes les offres", "Consolidation manuelle des données pour comparaison", "Rédaction d'une synthèse qualitative", "Préparation du rapport final (RAO)"], painPoints: ["Analyse subjective et non standardisée", "Manque de profondeur analytique possible", "Risque de biais", "Temps de décision allongé"] },
-                { id: 5, title: "XI/XII. Chiffrage & Simulation", category: "Étude", priority: "Très Haute", desc: "Modélisation financière de scénarios et de projections budgétaires.", workflow: ["Collecte manuelle des données d'entrée", "Construction de modèles complexes sur Excel", "Exécution de simulations", "Consolidation des résultats"], painPoints: ["Dépendance à des tableurs Excel complexes", "Risque élevé d'erreurs de modélisation", "Manque de traçabilité des calculs"] },
-                { id: 6, title: "III. Rapport Annuel (RPQS)", category: "Étude", priority: "Moyenne", desc: "Rédaction du Rapport Annuel sur le Prix et la Qualité du Service.", workflow: ["Envoi et collecte de questionnaires", "Analyse des rapports du délégataire", "Consolidation des données multi-sources", "Rédaction du rapport Word et de la présentation PPT"], painPoints: ["Processus long et répétitif", "Consolidation manuelle sujette à oublis"] },
-                 { id: 7, title: "VIII. Suivi de contrat (début)", category: "Gestion", priority: "Haute", desc: "Analyse initiale d'un nouveau contrat pour mettre en place le suivi.", workflow: ["Lecture exhaustive du contrat", "Extraction de toutes les obligations et dates clés", "Création de la grille de suivi Excel"], painPoints: ["Lecture manuelle de documents très longs et denses", "Tâche fastidieuse et chronophage"] }
+                { id: 1, title: "I. Audit de reversement", category: "Audit", priority: "Moyenne", desc: "Contrôle de la conformité des données transmises en fin de contrat.", workflow: ["Collecte des documents", "Vérification et Contrôle Qualité", "Saisie et Structuration des Données", "Rédaction du Rapport"], painPoints: ["Extraction manuelle de données", "Risque d'erreurs dans le rapport"] },
+                { id: 2, title: "II. Transfert de compétence", category: "Étude", priority: "Haute", desc: "État des lieux complet lors d'un transfert de compétence entre entités.", workflow: ["Collecte des Documents Volumineux", "Mise à jour des fichiers Excel", "Tâches de Consolidation", "Rédaction des Rapports et PPT"], painPoints: ["Qualité médiocre des scans", "Processus très chronophage", "Risque élevé d'erreurs de transcription"] },
+                { id: 3, title: "IV. Suivi de Contrat COPIL", category: "Gestion", priority: "Haute", desc: "Suivi régulier des obligations contractuelles pour les comités de pilotage.", workflow: ["Lecture du Contrat", "Saisie des Échéances", "Calcul des Pénalités", "Préparation de l'Ordre du Jour"], painPoints: ["Charge de travail importante", "Risque d'erreurs financières", "Manque de réactivité"] },
+                { id: 4, title: "IX. Analyse des Offres (RAO)", category: "Analyse", priority: "Très Haute", desc: "Analyse comparative complexe d'offres dans le cadre d'appels d'offres.", workflow: ["Analyse des Offres", "Consolidation des Données", "Rédaction de la Synthèse", "Préparation du Rapport Final"], painPoints: ["Analyse subjective et non standardisée", "Manque de profondeur analytique possible", "Risque de biais", "Temps de décision allongé"] },
+                { id: 5, title: "XI/XII. Chiffrage & Simulation", category: "Étude", priority: "Très Haute", desc: "Modélisation financière de scénarios et de projections budgétaires.", workflow: ["Collecte des Données d'Entrée", "Construction des Modèles", "Exécution des Simulations", "Consolidation des Résultats"], painPoints: ["Dépendance à des tableurs Excel complexes", "Risque élevé d'erreurs de modélisation", "Manque de traçabilité des calculs"] },
+                { id: 6, title: "III. Rapport Annuel (RPQS)", category: "Étude", priority: "Moyenne", desc: "Rédaction du Rapport Annuel sur le Prix et la Qualité du Service.", workflow: ["Collecte des Questionnaires", "Analyse des Rapports Délégataire", "Consolidation Multi-sources", "Rédaction du Rapport et PPT"], painPoints: ["Processus long et répétitif", "Consolidation manuelle sujette à oublis"] },
+                 { id: 7, title: "VIII. Suivi de contrat (début)", category: "Gestion", priority: "Haute", desc: "Analyse initiale d'un nouveau contrat pour mettre en place le suivi.", workflow: ["Lecture Exhaustive du Contrat", "Extraction des Obligations", "Création de la Grille de Suivi"], painPoints: ["Lecture manuelle de documents très longs et denses", "Tâche fastidieuse et chronophage"] }
             ];
 
             const grid = document.getElementById('process-grid');
@@ -409,6 +484,35 @@
                 });
             }
 
+            const workflowIcons = {
+                "collecte": "<div class='icon-scan'></div>",
+                "lecture": "<div class='icon-scan'></div>",
+                "extraction": "<div class='icon-scan'></div>",
+                "analyse": "<div class='icon-scan'></div>",
+                "vérification": "<div class='icon-check'><div class='checkmark-kick'></div><div class='checkmark-stem'></div></div>",
+                "contrôle": "<div class='icon-check'><div class='checkmark-kick'></div><div class='checkmark-stem'></div></div>",
+                "saisie": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "structuration": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "consolidation": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "création": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "rédaction": "<div class='icon-write'></div>",
+                "préparation": "<div class='icon-write'></div>",
+                "simulation": "<div class='icon-graph'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div>",
+                "calcul": "<div class='icon-graph'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div>",
+                "construction": "<div class='icon-graph'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div>",
+            };
+
+            function getWorkflowIcon(stepText) {
+                const text = stepText.toLowerCase();
+                for (const key in workflowIcons) {
+                    if (text.includes(key)) {
+                        return workflowIcons[key];
+                    }
+                }
+                return "<div class='icon-write'></div>"; // Default icon
+            }
+
+
             function showDetail(id) {
                 const process = processData.find(p => p.id === id);
                 if (!process) return;
@@ -424,13 +528,43 @@
                 prioritySpan.textContent = `Priorité ${process.priority}`;
                 prioritySpan.className = `tag ${getPriorityClass(process.priority)}`;
 
-                const workflowList = document.getElementById('detail-workflow');
-                workflowList.innerHTML = process.workflow.map((step, index) => `
-                    <li class="flex items-start">
-                        <span class="flex-shrink-0 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center mr-3" style="background-color: var(--primary-color);">${index + 1}</span>
+                // Animated Workflow
+                const workflowContainer = document.getElementById('detail-workflow');
+                workflowContainer.innerHTML = ''; // Clear previous content
+
+                process.workflow.forEach((step, index) => {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'workflow-step';
+                    stepEl.innerHTML = `
+                        <div class="workflow-icon-container">
+                            ${getWorkflowIcon(step)}
+                        </div>
                         <span>${step}</span>
-                    </li>
-                `).join('');
+                    `;
+                    workflowContainer.appendChild(stepEl);
+
+                    if (index < process.workflow.length - 1) {
+                        const arrowEl = document.createElement('div');
+                        arrowEl.className = 'workflow-arrow';
+                        arrowEl.innerHTML = '↓';
+                        workflowContainer.appendChild(arrowEl);
+                    }
+                });
+                
+                // Animate the steps
+                setTimeout(() => {
+                    const steps = workflowContainer.querySelectorAll('.workflow-step');
+                    const arrows = workflowContainer.querySelectorAll('.workflow-arrow');
+                    steps.forEach((step, index) => {
+                        setTimeout(() => {
+                            step.classList.add('visible');
+                            if (arrows[index]) {
+                                arrows[index].classList.add('visible');
+                            }
+                        }, index * 300); 
+                    });
+                }, 100);
+
 
                 const painpointsList = document.getElementById('detail-painpoints');
                 painpointsList.innerHTML = process.painPoints.map(pp => `<li>${pp}</li>`).join('');
@@ -463,81 +597,117 @@
 
             renderGrid();
 
-            const priorityCounts = processData.reduce((acc, p) => {
-                acc[p.priority] = (acc[p.priority] || 0) + 1;
-                return acc;
-            }, {});
+            const priorityColors = {
+                'Très Haute': '#DC2626',
+                'Haute': '#F59E0B',
+                'Moyenne': '#3B82F6'
+            };
+            
+            const priorityData = {
+                'Très Haute': { count: 0, processes: [] },
+                'Haute': { count: 0, processes: [] },
+                'Moyenne': { count: 0, processes: [] }
+            };
+
+            processData.forEach(p => {
+                if (priorityData[p.priority]) {
+                    priorityData[p.priority].count++;
+                    priorityData[p.priority].processes.push(p.title);
+                }
+            });
 
             const priorityChartCtx = document.getElementById('priorityChart').getContext('2d');
             new Chart(priorityChartCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(priorityCounts),
+                    labels: Object.keys(priorityData),
                     datasets: [{
-                        data: Object.values(priorityCounts),
-                        backgroundColor: ['#DC2626', '#F59E0B', '#3B82F6'],
+                        data: Object.values(priorityData).map(d => d.count),
+                        backgroundColor: Object.values(priorityColors),
                         borderColor: '#F9FAFB',
-                        borderWidth: 2
+                        borderWidth: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed !== null) {
-                                        label += context.parsed + ' processus';
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            const painPointCounts = processData.flatMap(p => p.painPoints).reduce((acc, pp) => {
-                acc[pp] = (acc[pp] || 0) + 1;
-                return acc;
-            }, {});
-
-            const painPointChartCtx = document.getElementById('painPointChart').getContext('2d');
-            new Chart(painPointChartCtx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(painPointCounts),
-                    datasets: [{
-                        label: 'Nombre de processus affectés',
-                        data: Object.values(painPointCounts),
-                        backgroundColor: 'rgba(0, 169, 157, 0.7)',
-                        borderColor: 'rgba(0, 169, 157, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                     scales: {
-                        x: {
-                            beginAtZero: true,
-                             ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    },
                     plugins: {
                         legend: { display: false }
                     }
                 }
             });
+
+            const legendContainer = document.getElementById('priority-legend');
+            legendContainer.innerHTML = Object.keys(priorityData).map(key => `
+                <div class="mb-3">
+                    <div class="flex items-center mb-1">
+                        <span class="w-4 h-4 rounded-full mr-2" style="background-color: ${priorityColors[key]}"></span>
+                        <h4 class="font-bold text-md" style="color: var(--secondary-color);">${key} (${priorityData[key].count})</h4>
+                    </div>
+                    <ul class="list-disc list-inside pl-4 text-xs text-gray-600">
+                        ${priorityData[key].processes.map(proc => `<li>${proc}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+
+            const painPointPriorityMap = { 'Très Haute': 3, 'Haute': 2, 'Moyenne': 1 };
+            const painPointData = {};
+
+            processData.forEach(p => {
+                p.painPoints.forEach(pp => {
+                    if (!painPointData[pp]) {
+                        painPointData[pp] = { frequency: 0, impactScore: 0 };
+                    }
+                    painPointData[pp].frequency++;
+                    painPointData[pp].impactScore += painPointPriorityMap[p.priority] || 0;
+                });
+            });
+
+            const bubbleData = Object.keys(painPointData).map((key, index) => ({
+                label: key,
+                x: (index % 4) + Math.random() * 0.5,
+                y: painPointData[key].impactScore / painPointData[key].frequency,
+                r: painPointData[key].frequency * 6
+            }));
+
+            const painPointChartCtx = document.getElementById('painPointChart').getContext('2d');
+            new Chart(painPointChartCtx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Points de Friction',
+                        data: bubbleData,
+                        backgroundColor: 'rgba(0, 169, 157, 0.7)',
+                        borderColor: 'rgba(0, 169, 157, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const data = context.raw;
+                                    return `${data.label}: ${data.r/6} processus affecté(s)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Impact (Priorité moyenne)' },
+                            min: 0,
+                            max: 3.5
+                        },
+                        x: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
 
             const tableContainer = document.getElementById('interactive-table-container');
             const similarityData = {
