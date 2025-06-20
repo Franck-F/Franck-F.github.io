@@ -459,7 +459,7 @@
                             <p class="text-sm text-gray-500 mb-4 flex-grow">Idéal pour l'exploration rapide et l'analyse individuelle de documents par un utilisateur unique.</p>
                             <dl class="solution-table space-y-3 text-sm">
                                 <dt>Besoin matériel</dt><dd>Non (Service SaaS)</dd>
-                                <dt>Coût</dt><dd>Usage de base gratuit. Pour une intégration API (Gemini 1.5 Pro), estimer environ 1€ à 5€ pour analyser un corpus de plusieurs centaines de pages.</dd>
+                                <dt>Coût</dt><dd>Usage de base gratuit. Pour une intégration API (Gemini 1.5 Pro), estimer environ <strong>1€ à 5€</strong> pour analyser un corpus de plusieurs centaines de pages.</dd>
                                 <dt>Fiabilité & Contrôle</dt><dd>Élevée pour la recherche factuelle, car il cite ses sources. Le contrôle sur le modèle d'IA est limité.</dd>
                                 <dt>Scalabilité</dt><dd>Très Élevée (gérée par Google).</dd>
                             </dl>
@@ -480,10 +480,10 @@
                             <h5 class="solution-title text-xl mb-2">PrivateGPT</h5>
                             <p class="text-sm text-gray-500 mb-4 flex-grow">Conçu pour une confidentialité absolue. Toutes les opérations s'exécutent localement, aucune donnée ne quitte la machine.</p>
                             <dl class="solution-table space-y-3 text-sm">
-                                <dt>Besoin matériel</dt><dd>Oui (PC puissant avec un bon GPU recommandé).</dd>
-                                <dt>Coût</dt><dd>Coût d'acquisition du matériel. Le logiciel est gratuit (open-source), pas de coût d'API.</dd>
-                                <dt>Fiabilité & Contrôle</dt><dd>Contrôle maximal sur la confidentialité. La fiabilité des réponses dépend de la performance des modèles locaux (souvent moins puissants que les API cloud).</dd>
-                                <dt>Scalabilité</dt><dd>Faible. Limitée à la puissance d'une seule machine et à un usage non-simultané.</dd>
+                                <dt>Besoin matériel</dt><dd>PC puissant avec GPU NVIDIA (<strong> RTX 3060+ avec 8Go+ VRAM</strong>) et <strong>16Go+ RAM.</strong></dd>
+                                <dt>Coût</dt><dd>Coût d'acquisition du matériel (<strong>estimé 600€-1100€</strong>). Pas de coût récurrent d'API.</dd>
+                                <dt>Fiabilité & Contrôle</dt><dd>Contrôle maximal sur la confidentialité. Fiabilité des réponses dépendante des modèles locaux.</dd>
+                                <dt>Scalabilité</dt><dd>Faible, limitée à une seule machine.</dd>
                             </dl>
                         </div>
                     </div>
@@ -508,7 +508,7 @@
                                 <dd>
                                     <ul class="list-disc pl-5 mt-1">
                                         <li><b class="text-gray-600">Cloud :</b> Aucun.</li>
-                                        <li><b class="text-gray-600">Auto-hébergé :</b> Serveur/VM avec ressources suffisantes (CPU/RAM) pour faire tourner l'application n8n.</li>
+                                        <li><b class="text-gray-600">Auto-hébergé :</b> Serveur/VM avec au moins <strong> 2 vCPU, 4 Go RAM, 40 Go disque</strong> pour une instance n8n stable.</li>
                                     </ul>
                                 </dd>
                             </div>
@@ -516,8 +516,8 @@
                                 <dt>Coût</dt>
                                 <dd>
                                     <ul class="list-disc pl-5 mt-1">
-                                        <li><b class="text-gray-600">Financier :</b> Coût de la licence de la plateforme (n8n, Make), coût à l'usage des API d'IA (ex: Azure, OpenAI), et coût d'hébergement si applicable.</li>
-                                        <li><b class="text-gray-600">Technique :</b> Temps de développement et de maintenance des workflows, et configuration des modèles d'extraction personnalisés.</li>
+                                        <li><b class="text-gray-600">Financier :</b> Licence plateforme (n8n Cloud dès <strong>20€/mois</strong>, Make dès <strong>9€/mois</strong>) + coût API IA (ex: Azure AI <strong>~1,50€/1000 pages</strong>) + hébergement si applicable. Ou Plateforme Self Host n8n  (<strong> ex: Hostinger  à 6.99€/mois </strong>). Ou en encore Licence Communautiare Self Host gratuit (mimimum réquis<strong> PC 16 Go+ RAM  </strong>)</li>
+                                        <li><b class="text-gray-600">Technique :</b> Développement et maintenance des workflows.</li>
                                     </ul>
                                 </dd>
                             </div>
@@ -526,7 +526,7 @@
                                 <dd>
                                     <ul class="list-disc pl-5 mt-1">
                                          <li><b class="text-gray-600">Fiabilité :</b> Très élevée après entraînement et mise en place de boucles de validation humaine.</li>
-                                         <li><b class="text-gray-600">Scalabilité :</b> Très élevée, particulièrement avec les versions Cloud, capable de traiter des volumes importants en parallèle.</li>
+                                         <li><b class="text-gray-600">Scalabilité :</b> Très élevée, particulièrement avec les versions Cloud.</li>
                                     </ul>
                                 </dd>
                             </div>
