@@ -459,7 +459,7 @@
                             <p class="text-sm text-gray-500 mb-4 flex-grow">Idéal pour l'exploration rapide et l'analyse individuelle de documents par un utilisateur unique.</p>
                             <dl class="solution-table space-y-3 text-sm">
                                 <dt>Besoin matériel</dt><dd>Non (Service SaaS)</dd>
-                                <dt>Coût</dt><dd>Gratuit (basé sur l'API Gemini). Peut devenir payant pour un usage intensif via API.</dd>
+                                <dt>Coût</dt><dd>Usage de base gratuit. Pour une intégration API (Gemini 1.5 Pro), estimer environ 1€ à 5€ pour analyser un corpus de plusieurs centaines de pages.</dd>
                                 <dt>Fiabilité & Contrôle</dt><dd>Élevée pour la recherche factuelle, car il cite ses sources. Le contrôle sur le modèle d'IA est limité.</dd>
                                 <dt>Scalabilité</dt><dd>Très Élevée (gérée par Google).</dd>
                             </dl>
@@ -469,9 +469,9 @@
                             <h5 class="solution-title text-xl mb-2">AnythingLLM</h5>
                             <p class="text-sm text-gray-500 mb-4 flex-grow">Solution d'entreprise, open-source et auto-hébergée pour un "chat" collaboratif et sécurisé avec les documents.</p>
                             <dl class="solution-table space-y-3 text-sm">
-                                <dt>Besoin matériel</dt><dd>Oui (Serveur pour l'hébergement).</dd>
-                                <dt>Coût</dt><dd>Coût de l'hébergement du serveur + coût des appels API aux modèles de langage (OpenAI, Azure, Anthropic) ou coût d'un GPU pour un modèle local.</dd>
-                                <dt>Fiabilité & Contrôle</dt><dd>Très élevés. Contrôle total sur les modèles utilisés, les données (qui restent en interne) et la gestion des accès multi-utilisateurs.</dd>
+                                <dt>Besoin matériel</dt><dd>Serveur/VM avec au moins <strong> 4Go RAM, 2 vCPU.</strong> GPU (ex: NVIDIA RTX 3060) recommandé pour héberger le LLM.</dd>
+                                <dt>Coût</dt><dd>Coût du serveur <strong>(~20€-100€/mois)</strong> + coût des appels API (OpenAI, Azure) ou amortissement du GPU.</dd>
+                                <dt>Fiabilité & Contrôle</dt><dd>Très élevés. Contrôle total sur les modèles, les données (en interne) et la gestion des accès.</dd>
                                 <dt>Scalabilité</dt><dd>Dépend de l'infrastructure serveur mise en place.</dd>
                             </dl>
                         </div>
