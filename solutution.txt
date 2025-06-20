@@ -1,4 +1,351 @@
-<section id="solution" class="py-24">
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard d'Automatisation des Processus Métier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: "Bert Consultant" - Un fond blanc cassé avec le bleu sarcelle (#00A99D) et le violet foncé (#3F2A56) du logo comme couleurs primaires et secondaires. -->
+    <!-- Application Structure Plan: L'application est conçue comme un tableau de bord stratégique en 4 sections, guidant l'utilisateur de la problématique à la solution. 1) 'Diagnostic' expose le flux de travail inefficace actuel. 2) 'Explorateur de Processus' permet une immersion interactive dans chaque processus via des cartes filtrables. 3) 'Analyse des Frictions' agrège et visualise les problèmes récurrents et les synergies entre processus pour en souligner l'impact systémique. 4) 'La Solution IA' présente l'architecture d'agents IA proposée de manière visuelle et compréhensible. Cette structure non-linéaire transforme le rapport statique en un outil d'exploration et de prise de décision. -->
+    <!-- Visualization & Content Choices: 1. Diagnostic (Flux actuel): Diagramme HTML/CSS simple (Goal: Informer). 2. Priorités d'Automatisation: Graphique en anneau Chart.js avec légende HTML détaillée (Goal: Comparer & Informer). 3. Frictions Systémiques: Diagramme à bulles Chart.js pour montrer la fréquence et l'impact (Goal: Analyser & Prioriser). 4. Matrice de Similitude: Tableau interactif (HTML Table) avec coloration de type heatmap (Goal: Explorer & Analyser). 5. Architecture de la Solution: Simulation de flux de travail interactive pour démontrer le système d'agents MCP (Goal: Expliquer & Engager). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB; /* Light gray background */
+            color: #374151; /* Darker gray text */
+        }
+        :root {
+            --primary-color: #00A99D; /* Teal */
+            --secondary-color: #3F2A56; /* Dark Purple */
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .tag-red { background-color: #FECACA; color: #991B1B; }
+        .tag-orange { background-color: #FDE68A; color: #92400E; }
+        .tag-blue { background-color: #BFDBFE; color: #1E40AF; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        #solution-container {
+            position: relative;
+        }
+        #solution-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .agent-node {
+            transition: all 0.5s ease;
+            opacity: 0.4;
+            transform: scale(0.95);
+            position: relative;
+            z-index: 2;
+        }
+        .agent-node.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 169, 157, 0.6);
+        }
+        .agent-node.clickable {
+             cursor: pointer;
+        }
+        .interactive-table-container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .interactive-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.8rem;
+        }
+        .interactive-table th, .interactive-table td {
+            border: 1px solid #E2E8F0;
+            padding: 0.5rem;
+            text-align: center;
+            position: relative;
+        }
+        .interactive-table th {
+            background-color: #F8FAFC;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        .interactive-table th.col-header {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            padding: 0.75rem 0.25rem;
+        }
+        .interactive-table th.highlight, .interactive-table td.highlight-strong {
+            background-color: #A7F3D0; /* Light Teal */
+        }
+         .interactive-table td.highlight-weak {
+            background-color: #E0E7FF; /* Light purple */
+         }
+         .interactive-table td {
+            transition: background-color 0.2s;
+         }
+        .interactive-table td .tooltip {
+            visibility: hidden;
+            width: 80px;
+            background-color: var(--secondary-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 20;
+            bottom: 110%;
+            left: 50%;
+            margin-left: -40px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+         .interactive-table td:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .workflow-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .workflow-icon-container {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .workflow-arrow {
+            text-align: center;
+            color: #D1D5DB; /* gray-300 */
+            font-size: 1.5rem;
+            height: 2rem;
+            opacity: 0;
+            transition: opacity 0.4s ease 0.2s;
+        }
+        .workflow-arrow.visible {
+            opacity: 1;
+        }
+        /* Animated Icons CSS */
+        .icon-scan {
+            width: 24px; height: 28px; background-color: #A7F3D0; border: 2px solid var(--primary-color); border-radius: 2px; position: relative; overflow: hidden;
+        }
+        .icon-scan::before {
+            content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 2px; background-color: var(--primary-color); animation: scan 1.5s ease-in-out infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 26px; }
+            100% { top: 0; }
+        }
+        .icon-check {
+            width: 28px; height: 28px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-check .checkmark-stem { width: 3px; height: 0; background-color: var(--primary-color); transform: rotate(45deg); transition: height 0.2s ease-out 0.3s; }
+        .icon-check .checkmark-kick { width: 0; height: 3px; background-color: var(--primary-color); transform: rotate(45deg); transition: width 0.2s ease-out; }
+        .visible .icon-check .checkmark-stem { height: 14px; }
+        .visible .icon-check .checkmark-kick { width: 8px; transform: translate(-1px, -1px) rotate(45deg); }
+        .icon-write {
+            width: 24px; height: 28px; background-color: #FEF3C7; border: 2px solid #FBBF24; border-radius: 2px; position: relative;
+        }
+        .icon-write::before { content: ''; position: absolute; top: 8px; left: 4px; width: 2px; height: 12px; background: #FBBF24; animation: typing 1s infinite; }
+        @keyframes typing {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .icon-grid {
+            width: 24px; height: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+        }
+        .icon-grid .cell { background-color: #E0E7FF; transition: background-color 0.2s; }
+        .visible .icon-grid .cell:nth-child(1) { transition-delay: 0.1s; background-color: #6366F1; }
+        .visible .icon-grid .cell:nth-child(2) { transition-delay: 0.2s; background-color: #6366F1; }
+        .visible .icon-grid .cell:nth-child(3) { transition-delay: 0.3s; background-color: #6366F1; }
+        .visible .icon-grid .cell:nth-child(4) { transition-delay: 0.4s; background-color: #6366F1; }
+        .icon-graph {
+            width: 28px; height: 24px; display: flex; align-items: flex-end; justify-content: space-around;
+        }
+        .icon-graph .bar { background-color: var(--secondary-color); width: 6px; height: 0; transition: height 0.4s ease-in-out; }
+        .visible .icon-graph .bar:nth-child(1) { height: 60%; transition-delay: 0.1s; }
+        .visible .icon-graph .bar:nth-child(2) { height: 90%; transition-delay: 0.2s; }
+        .visible .icon-graph .bar:nth-child(3) { height: 40%; transition-delay: 0.3s; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <img src="logo-bert-consultant-xs.jpg" alt="Logo Bert Consultant" class="h-8">
+            <ul class="flex space-x-8">
+                <li><a href="#diagnostic" class="nav-link text-gray-600 hover:text-gray-900">Diagnostic</a></li>
+                <li><a href="#explorer" class="nav-link text-gray-600 hover:text-gray-900">Explorateur</a></li>
+                <li><a href="#analyse" class="nav-link text-gray-600 hover:text-gray-900">Analyse</a></li>
+                <li><a href="#solution" class="nav-link text-gray-600 hover:text-gray-900">La Solution</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="diagnostic" class="text-center py-16">
+            <h2 class="text-4xl font-bold mb-4 text-gray-800">Le Constat</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12">
+                L'analyse des processus révèle une dépendance à une "trinité documentaire" (PDF, Excel, Word)  .
+            </p>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-4">
+                <div class="bg-white p-6 rounded-xl shadow-md text-center w-64">
+                    <div class="text-4xl mb-3">📄</div>
+                    <h3 class="text-lg font-semibold text-gray-800">PDF & Scans</h3>
+                    <p class="text-sm text-gray-500">Documents d'entrée non structurés et parfois illisibles</p>
+                </div>
+                <div class="text-2xl text-gray-300 mx-4 hidden md:block">→</div>
+                <div class="bg-white p-6 rounded-xl shadow-md text-center w-64">
+                    <div class="text-4xl mb-3">📊</div>
+                    <h3 class="text-lg font-semibold text-gray-800">Excel</h3>
+                    <p class="text-sm text-gray-500">Saisie manuelle & silos de données</p>
+                </div>
+                <div class="text-2xl text-gray-300 mx-4 hidden md:block">→</div>
+                <div class="bg-white p-6 rounded-xl shadow-md text-center w-64">
+                    <div class="text-4xl mb-3">📝</div>
+                    <h3 class="text-lg font-semibold text-gray-800">Word & PPT</h3>
+                    <p class="text-sm text-gray-500">Rapports finaux manuels</p>
+                </div>
+            </div>
+            <p class="max-w-3xl mx-auto text-md text-gray-600 mt-12">
+                Ce cycle manuel est non seulement chronophage mais constitue un risque opérationnel majeur. La solution n'est pas d'accélérer ce cycle, mais de le réinventer en s'attaquant à sa racine : l'architecture de données fragmentée.
+            </p>
+        </section>
+
+        <section id="explorer" class="py-16">
+            <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Explorateur des Processus Métier</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12 text-center">
+                Plongez au cœur des opérations. Chaque processus a été analysé pour identifier son flux, ses outils et ses points faibles. Utilisez les filtres pour naviguer et cliquez sur une carte pour afficher les détails.
+            </p>
+
+            <div class="flex justify-center mb-8 space-x-2" id="filters">
+                <button class="filter-btn active text-white px-4 py-2 rounded-full font-semibold" style="background-color: var(--secondary-color);">Tous</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Audit">Audit & Contrôle</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Gestion">Gestion Contractuelle</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Analyse">Analyse & Décision</button>
+                <button class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-semibold" data-filter="Étude">Études & Finances</button>
+            </div>
+
+            <div id="process-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+
+            <div id="process-detail" class="hidden mt-12 bg-white p-8 rounded-xl shadow-lg">
+                <button id="close-detail" class="float-right font-bold text-2xl text-gray-500 hover:text-gray-800">&times;</button>
+                <h3 id="detail-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                <div class="space-x-2 mb-4">
+                    <span id="detail-category" class="tag"></span>
+                    <span id="detail-priority" class="tag"></span>
+                </div>
+                <p id="detail-description" class="text-gray-600 mb-6"></p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-lg mb-3 text-gray-800">Flux de Travail :</h4>
+                        <div id="detail-workflow" class="space-y-2"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg mb-3 text-gray-800">Points de Friction :</h4>
+                        <ul id="detail-painpoints" class="list-disc list-inside space-y-2 text-red-700"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analyse" class="py-16 bg-white rounded-2xl">
+            <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Analyse Globale des Frictions et Synergies</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-12 text-center">
+                Les problèmes ne sont pas isolés. Cette analyse agrégée révèle des points de friction systémiques et des synergies fortes entre processus, justifiant une approche de solution centralisée et réutilisable.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-16 items-start">
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Priorités d'Automatisation</h3>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                    <div id="priority-legend" class="mt-4 px-2"></div>
+                </div>
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Analyse des Frictions Courantes</h3>
+                    <p class="text-sm text-center text-gray-500 mb-4 -mt-2">La taille des bulles indique la fréquence ; la hauteur indique l'impact.</p>
+                     <div class="chart-container" style="max-width: 600px; height: 350px;">
+                        <canvas id="painPointChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-20">
+                 <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">Tableau Interactif des Synergies</h3>
+                 <p class="max-w-3xl mx-auto text-md text-gray-600 mb-8 text-center">
+                    Survolez le tableau pour explorer les synergies. Une couleur intense indique une forte similarité. L'infobulle donne le pourcentage exact et les en-têtes sont mis en évidence pour une meilleure lisibilité.
+                </p>
+                <div id="interactive-table-container" class="overflow-x-auto p-4"></div>
+            </div>
+        </section>
+        <!--Solution-->
+        <section id="solution" class="py-24">
             <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Simulation du Système Multi-Agent MCP</h2>
              <p class="max-w-4xl mx-auto text-lg text-gray-600 mb-8 text-center">
                Sélectionnez un processus pour voir comment les agents spécialisés collaborent dans n8n. Cliquez sur un agent activé pour découvrir son rôle et les technologies qu'il emploie.
@@ -74,3 +421,528 @@
                 </div>
             </div>
         </section>
+    </main>
+
+    <footer class="text-white text-center py-6" style="background-color: var(--secondary-color);">
+        <p>&copy;2025 JRBC - Analyse des processus métier</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const processData = [
+                { id: 1, title: "I. Audit de reversement", category: "Audit", priority: "Moyenne", desc: "Contrôle de la conformité des données transmises en fin de contrat.", workflow: ["Collecte des documents", "Vérification et Contrôle Qualité", "Saisie et Structuration des Données", "Rédaction du Rapport"], painPoints: ["Extraction manuelle de données", "Risque d'erreurs dans le rapport"] },
+                { id: 2, title: "II. Transfert de compétence", category: "Étude", priority: "Haute", desc: "État des lieux complet lors d'un transfert de compétence entre entités.", workflow: ["Collecte des Documents Volumineux", "Mise à jour des fichiers Excel", "Tâches de Consolidation", "Rédaction des Rapports et PPT"], painPoints: ["Qualité médiocre des scans", "Processus très chronophage", "Risque élevé d'erreurs de transcription"] },
+                { id: 3, title: "IV. Suivi de Contrat COPIL", category: "Gestion", priority: "Haute", desc: "Suivi régulier des obligations contractuelles pour les comités de pilotage.", workflow: ["Lecture du Contrat", "Saisie des Échéances", "Calcul des Pénalités", "Préparation de l'Ordre du Jour"], painPoints: ["Charge de travail importante", "Risque d'erreurs financières", "Manque de réactivité"] },
+                { id: 4, title: "IX. Analyse des Offres (RAO)", category: "Analyse", priority: "Très Haute", desc: "Analyse comparative complexe d'offres dans le cadre d'appels d'offres.", workflow: ["Analyse des Offres", "Consolidation des Données", "Rédaction de la Synthèse", "Préparation du Rapport Final"], painPoints: ["Analyse subjective et non standardisée", "Manque de profondeur analytique possible", "Risque de biais", "Temps de décision allongé"] },
+                { id: 5, title: "XI/XII. Chiffrage & Simulation", category: "Étude", priority: "Très Haute", desc: "Modélisation financière de scénarios et de projections budgétaires.", workflow: ["Collecte des Données d'Entrée", "Construction des Modèles", "Exécution des Simulations", "Consolidation des Résultats"], painPoints: ["Dépendance à des tableurs Excel complexes", "Risque élevé d'erreurs de modélisation"] },
+                { id: 6, title: "III. Rapport Annuel (RPQS)", category: "Étude", priority: "Moyenne", desc: "Rédaction du Rapport Annuel sur le Prix et la Qualité du Service.", workflow: ["Collecte des Questionnaires", "Analyse des Rapports Délégataire", "Consolidation Multi-sources", "Rédaction du Rapport et PPT"], painPoints: ["Processus long et répétitif", "Consolidation manuelle sujette à oublis"] },
+                 { id: 7, title: "VIII. Suivi de contrat (début)", category: "Gestion", priority: "Haute", desc: "Analyse initiale d'un nouveau contrat pour mettre en place le suivi.", workflow: ["Lecture Exhaustive du Contrat", "Extraction des Obligations", "Création de la Grille de Suivi"], painPoints: ["Lecture manuelle de documents très longs et denses", "Tâche fastidieuse et chronophage"] }
+            ];
+
+            const grid = document.getElementById('process-grid');
+            const detailView = document.getElementById('process-detail');
+            const closeDetailBtn = document.getElementById('close-detail');
+
+            function getPriorityClass(priority) {
+                switch (priority) {
+                    case 'Très Haute': return 'tag-red';
+                    case 'Haute': return 'tag-orange';
+                    case 'Moyenne': return 'tag-blue';
+                    default: return 'bg-gray-200 text-gray-800';
+                }
+            }
+
+            function getCategoryClass(category) {
+                 switch (category) {
+                    case 'Audit': return 'bg-red-100 text-red-800';
+                    case 'Gestion': return 'bg-yellow-100 text-yellow-800';
+                    case 'Analyse': return 'bg-purple-100 text-purple-800';
+                    case 'Étude': return 'bg-green-100 text-green-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            }
+
+            function renderGrid(filter = 'all') {
+                grid.innerHTML = '';
+                const filteredData = (filter === 'all') ? processData : processData.filter(p => p.category.startsWith(filter.substring(0,5)));
+
+                filteredData.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'card bg-white p-6 rounded-xl shadow-md cursor-pointer';
+                    card.dataset.id = p.id;
+                    card.innerHTML = `
+                        <h3 class="font-bold text-lg text-gray-800 mb-2">${p.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 h-10">${p.desc}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="tag ${getCategoryClass(p.category)}">${p.category}</span>
+                            <span class="tag ${getPriorityClass(p.priority)}">Priorité ${p.priority}</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => showDetail(p.id));
+                    grid.appendChild(card);
+                });
+            }
+
+            const workflowIcons = {
+                "collecte": "<div class='icon-scan'></div>",
+                "lecture": "<div class='icon-scan'></div>",
+                "extraction": "<div class='icon-scan'></div>",
+                "analyse": "<div class='icon-scan'></div>",
+                "vérification": "<div class='icon-check'><div class='checkmark-kick'></div><div class='checkmark-stem'></div></div>",
+                "contrôle": "<div class='icon-check'><div class='checkmark-kick'></div><div class='checkmark-stem'></div></div>",
+                "saisie": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "structuration": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "consolidation": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "création": "<div class='icon-grid'>"+"<div class='cell'></div>".repeat(9)+"</div>",
+                "rédaction": "<div class='icon-write'></div>",
+                "préparation": "<div class='icon-write'></div>",
+                "simulation": "<div class='icon-graph'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div>",
+                "calcul": "<div class='icon-graph'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div>",
+                "construction": "<div class='icon-graph'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div>",
+            };
+
+            function getWorkflowIcon(stepText) {
+                const text = stepText.toLowerCase();
+                for (const key in workflowIcons) {
+                    if (text.includes(key)) {
+                        return workflowIcons[key];
+                    }
+                }
+                return "<div class='icon-write'></div>"; // Default icon
+            }
+
+
+            function showDetail(id) {
+                const process = processData.find(p => p.id === id);
+                if (!process) return;
+
+                document.getElementById('detail-title').textContent = process.title;
+                document.getElementById('detail-description').textContent = process.desc;
+                
+                const categorySpan = document.getElementById('detail-category');
+                categorySpan.textContent = process.category;
+                categorySpan.className = `tag ${getCategoryClass(process.category)}`;
+
+                const prioritySpan = document.getElementById('detail-priority');
+                prioritySpan.textContent = `Priorité ${process.priority}`;
+                prioritySpan.className = `tag ${getPriorityClass(process.priority)}`;
+
+                // Animated Workflow
+                const workflowContainer = document.getElementById('detail-workflow');
+                workflowContainer.innerHTML = ''; // Clear previous content
+
+                process.workflow.forEach((step, index) => {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'workflow-step';
+                    stepEl.innerHTML = `
+                        <div class="workflow-icon-container">
+                            ${getWorkflowIcon(step)}
+                        </div>
+                        <span>${step}</span>
+                    `;
+                    workflowContainer.appendChild(stepEl);
+
+                    if (index < process.workflow.length - 1) {
+                        const arrowEl = document.createElement('div');
+                        arrowEl.className = 'workflow-arrow';
+                        arrowEl.innerHTML = '↓';
+                        workflowContainer.appendChild(arrowEl);
+                    }
+                });
+                
+                // Animate the steps
+                setTimeout(() => {
+                    const steps = workflowContainer.querySelectorAll('.workflow-step');
+                    const arrows = workflowContainer.querySelectorAll('.workflow-arrow');
+                    steps.forEach((step, index) => {
+                        setTimeout(() => {
+                            step.classList.add('visible');
+                            if (arrows[index]) {
+                                arrows[index].classList.add('visible');
+                            }
+                        }, index * 300); 
+                    });
+                }, 100);
+
+
+                const painpointsList = document.getElementById('detail-painpoints');
+                painpointsList.innerHTML = process.painPoints.map(pp => `<li>${pp}</li>`).join('');
+
+                detailView.classList.remove('hidden');
+                detailView.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            closeDetailBtn.addEventListener('click', () => {
+                detailView.classList.add('hidden');
+            });
+            
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.style.backgroundColor = '#E5E7EB'; // gray-200
+                        btn.style.color = '#374151'; // gray-800
+                    });
+                    button.classList.add('active');
+                    button.style.backgroundColor = 'var(--secondary-color)';
+                    button.style.color = 'white';
+                    renderGrid(button.dataset.filter);
+                     if (!detailView.classList.contains('hidden')) {
+                        detailView.classList.add('hidden');
+                    }
+                });
+            });
+
+            renderGrid();
+
+            const priorityColors = {
+                'Très Haute': '#DC2626',
+                'Haute': '#F59E0B',
+                'Moyenne': '#3B82F6'
+            };
+            
+            const priorityData = {
+                'Très Haute': { count: 0, processes: [] },
+                'Haute': { count: 0, processes: [] },
+                'Moyenne': { count: 0, processes: [] }
+            };
+
+            processData.forEach(p => {
+                if (priorityData[p.priority]) {
+                    priorityData[p.priority].count++;
+                    priorityData[p.priority].processes.push(p.title);
+                }
+            });
+
+            const priorityChartCtx = document.getElementById('priorityChart').getContext('2d');
+            new Chart(priorityChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(priorityData),
+                    datasets: [{
+                        data: Object.values(priorityData).map(d => d.count),
+                        backgroundColor: Object.values(priorityColors),
+                        borderColor: '#F9FAFB',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            const legendContainer = document.getElementById('priority-legend');
+            legendContainer.innerHTML = Object.keys(priorityData).map(key => `
+                <div class="mb-3">
+                    <div class="flex items-center mb-1">
+                        <span class="w-4 h-4 rounded-full mr-2" style="background-color: ${priorityColors[key]}"></span>
+                        <h4 class="font-bold text-md" style="color: var(--secondary-color);">${key} (${priorityData[key].count})</h4>
+                    </div>
+                    <ul class="list-disc list-inside pl-4 text-xs text-gray-600">
+                        ${priorityData[key].processes.map(proc => `<li>${proc}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+
+            const painPointPriorityMap = { 'Très Haute': 3, 'Haute': 2, 'Moyenne': 1 };
+            const painPointData = {};
+
+            processData.forEach(p => {
+                p.painPoints.forEach(pp => {
+                    if (!painPointData[pp]) {
+                        painPointData[pp] = { frequency: 0, impactScore: 0 };
+                    }
+                    painPointData[pp].frequency++;
+                    painPointData[pp].impactScore += painPointPriorityMap[p.priority] || 0;
+                });
+            });
+
+            const bubbleData = Object.keys(painPointData).map((key, index) => ({
+                label: key,
+                x: (index % 4) + Math.random() * 0.5,
+                y: painPointData[key].impactScore / painPointData[key].frequency,
+                r: painPointData[key].frequency * 6
+            }));
+
+            const painPointChartCtx = document.getElementById('painPointChart').getContext('2d');
+            new Chart(painPointChartCtx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Points de Friction',
+                        data: bubbleData,
+                        backgroundColor: 'rgba(0, 169, 157, 0.7)',
+                        borderColor: 'rgba(0, 169, 157, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const data = context.raw;
+                                    return `${data.label}: ${data.r/6} processus affecté(s)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Impact (Priorité moyenne)' },
+                            min: 0,
+                            max: 3.5
+                        },
+                        x: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+
+            const tableContainer = document.getElementById('interactive-table-container');
+            const similarityData = {
+                labels: ["I. Audit", "II. Transfert", "III. RPQS", "IV. Suivi COPIL", "VIII. Suivi Début", "IX. RAO", "X. Audit Tech.", "XI/XII. Chiffrage"],
+                matrix: [
+                    [1.00, 0.29, 0.57, 0.86, 0.86, 0.43, 0.71, 0.29],
+                    [0.29, 1.00, 0.43, 0.29, 0.29, 0.43, 0.43, 0.57],
+                    [0.57, 0.43, 1.00, 0.57, 0.57, 0.71, 0.43, 0.43],
+                    [0.86, 0.29, 0.57, 1.00, 1.00, 0.57, 0.71, 0.29],
+                    [0.86, 0.29, 0.57, 1.00, 1.00, 0.57, 0.71, 0.29],
+                    [0.43, 0.43, 0.71, 0.57, 0.57, 1.00, 0.43, 0.57],
+                    [0.71, 0.43, 0.43, 0.71, 0.71, 0.43, 1.00, 0.43],
+                    [0.29, 0.57, 0.43, 0.29, 0.29, 0.57, 0.43, 1.00]
+                ]
+            };
+
+            function createInteractiveTable() {
+                tableContainer.innerHTML = '';
+                const table = document.createElement('table');
+                table.className = 'interactive-table';
+
+                const thead = table.createTHead();
+                const headerRow = thead.insertRow();
+                const emptyTh = document.createElement('th');
+                headerRow.appendChild(emptyTh);
+                
+                similarityData.labels.forEach((label, i) => {
+                    const th = document.createElement('th');
+                    th.className = 'col-header';
+                    th.id = `col-header-${i}`;
+                    th.textContent = label.replace(/ *\([^)]*\) */g, "");
+                    headerRow.appendChild(th);
+                });
+
+                const tbody = table.createTBody();
+                similarityData.matrix.forEach((row, i) => {
+                    const tr = tbody.insertRow();
+                    const rowHeader = document.createElement('th');
+                    rowHeader.id = `row-header-${i}`;
+                    rowHeader.textContent = similarityData.labels[i].replace(/ *\([^)]*\) */g, "");
+                    tr.appendChild(rowHeader);
+                    
+                    row.forEach((value, j) => {
+                        const td = tr.insertCell();
+                        td.dataset.rowIndex = i;
+                        td.dataset.colIndex = j;
+                        
+                        const primaryColor = '0, 169, 157'; // Teal
+                        td.style.backgroundColor = `rgba(${primaryColor}, ${value * 0.8})`;
+                        td.innerHTML = `<span class="tooltip">${Math.round(value * 100)}%</span>`;
+                    });
+                });
+
+                tableContainer.appendChild(table);
+
+                tbody.addEventListener('mouseover', (e) => {
+                    if (e.target.tagName === 'TD') {
+                        const rowIndex = e.target.dataset.rowIndex;
+                        const colIndex = e.target.dataset.colIndex;
+                        document.getElementById(`row-header-${rowIndex}`).classList.add('highlight-strong');
+                        document.getElementById(`col-header-${colIndex}`).classList.add('highlight-strong');
+                        e.target.classList.add('highlight-weak');
+                    }
+                });
+
+                tbody.addEventListener('mouseout', (e) => {
+                    if (e.target.tagName === 'TD') {
+                        const rowIndex = e.target.dataset.rowIndex;
+                        const colIndex = e.target.dataset.colIndex;
+                        document.getElementById(`row-header-${rowIndex}`).classList.remove('highlight-strong');
+                        document.getElementById(`col-header-${colIndex}`).classList.remove('highlight-strong');
+                        e.target.classList.remove('highlight-weak');
+                    }
+                });
+            }
+            
+            createInteractiveTable();
+
+            // --- Solution Simulation Logic ---
+            const startBtn = document.getElementById('start-simulation');
+            const selector = document.getElementById('process-selector');
+            const canvas = document.getElementById('solution-canvas');
+            const ctx = canvas.getContext('2d');
+            const modal = document.getElementById('agent-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            const agentData = {
+                0: { title: "Agent Collecte", desc: "Récupère les documents sources depuis divers canaux (emails, dossiers, API). C'est le point d'entrée du système.", nodes: "Webhook, IMAP Email, Read Binary File, FTP, HTTP Request." },
+                1: { title: "Agent Vérification", desc: "Assure la qualité et la conformité des documents. Il peut classifier les fichiers, vérifier leur lisibilité et s'assurer que toutes les pièces requises sont présentes.", nodes: "IF, Switch, HTTP Request vers une IA de classification, Function (code personnalisé)." },
+                2: { title: "Agent Structuration", desc: "Remplace la saisie manuelle. Il utilise l'IA pour extraire les données pertinentes (texte, tableaux, chiffres) et les transforme en format structuré (JSON) pour un usage ultérieur.", nodes: "HTTP Request vers Azure AI / Google Vision, Function, Base de données (Postgres, etc.)." },
+                3: { title: "Agent Rédaction", desc: "Génère automatiquement les documents textuels comme les rapports ou les synthèses à partir de modèles Word pré-établis et des données structurées.", nodes: "Function (avec librairies type docxtemplater), HTTP Request vers une API de génération." },
+                4: { title: "Agent Présentation", desc: "Crée les supports de présentation PowerPoint en peuplant dynamiquement des modèles avec des chiffres clés, des graphiques et des résumés.", nodes: "Function (avec librairies type pptxgenjs), Move/Write Binary File." },
+                5: { title: "Agent Communication", desc: "Diffuse les livrables finaux, envoie des notifications de fin de processus et archive les documents aux emplacements appropriés.", nodes: "Send Email, Microsoft Teams, Slack, SharePoint." }
+            };
+
+            const processPaths = {
+                'rao': [0, 1, 2, 3, 4, 5],
+                'suivi_contrat': [0, 2, 3, 5],
+                'rpqs': [0, 2, 3, 4, 5]
+            };
+
+            let currentPath = [];
+            let currentStep = 0;
+
+            function resetSimulation() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                document.querySelectorAll('.agent-node').forEach(node => {
+                    node.classList.remove('active', 'clickable');
+                });
+                const existingBtn = document.querySelector('#solution-container button');
+                if (existingBtn) existingBtn.remove();
+                currentStep = 0;
+            }
+            
+            startBtn.addEventListener('click', () => {
+                resetSimulation();
+                currentPath = processPaths[selector.value];
+                activateAgent(currentPath[0]);
+            });
+
+            function activateAgent(agentId) {
+                const node = document.getElementById(`agent-${agentId}`);
+                if (node) {
+                    node.classList.add('active', 'clickable');
+                    node.onclick = () => showAgentDetails(agentId);
+                }
+
+                if (currentStep > 0) {
+                    const prevAgentId = currentPath[currentStep - 1];
+                    const prevNode = document.getElementById(`agent-${prevAgentId}`);
+                    if (prevNode) {
+                       prevNode.onclick = () => showAgentDetails(prevAgentId); // Keep previous nodes clickable
+                       animatePath(prevNode, node, () => {
+                           if (currentStep < currentPath.length - 1) {
+                               const nextBtn = document.createElement('button');
+                               nextBtn.innerHTML = `Suivant &rarr;`;
+                               nextBtn.className = 'absolute bottom-4 right-4 text-white font-bold py-2 px-4 rounded-lg transition-colors z-10';
+                               nextBtn.style.backgroundColor = 'var(--primary-color)';
+                               nextBtn.onclick = () => {
+                                   currentStep++;
+                                   activateAgent(currentPath[currentStep]);
+                                   nextBtn.remove();
+                               };
+                               // Quick hack to prevent multiple buttons
+                               const existingBtn = document.querySelector('#solution-container button');
+                               if (existingBtn) existingBtn.remove();
+                               document.getElementById('solution-container').appendChild(nextBtn);
+                           }
+                       });
+                    }
+                } else {
+                     if (currentStep < currentPath.length - 1) {
+                           const nextBtn = document.createElement('button');
+                           nextBtn.innerHTML = `Suivant &rarr;`;
+                           nextBtn.className = 'absolute bottom-4 right-4 text-white font-bold py-2 px-4 rounded-lg transition-colors z-10';
+                           nextBtn.style.backgroundColor = 'var(--primary-color)';
+                           nextBtn.onclick = () => {
+                               currentStep++;
+                               activateAgent(currentPath[currentStep]);
+                               nextBtn.remove();
+                           };
+                           const existingBtn = document.querySelector('#solution-container button');
+                           if (existingBtn) existingBtn.remove();
+                           document.getElementById('solution-container').appendChild(nextBtn);
+                       }
+                }
+            }
+            
+            function showAgentDetails(agentId) {
+                const data = agentData[agentId];
+                document.getElementById('modal-title').innerText = data.title;
+                document.getElementById('modal-description').innerText = data.desc;
+                document.getElementById('modal-nodes').innerText = data.nodes;
+                modal.style.display = 'flex';
+            }
+            
+            closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            function animatePath(startNode, endNode, callback) {
+                const containerRect = canvas.parentElement.getBoundingClientRect();
+                const startRect = startNode.getBoundingClientRect();
+                const endRect = endNode.getBoundingClientRect();
+
+                const startX = startRect.left + startRect.width / 2 - containerRect.left;
+                const startY = startRect.top + startRect.height / 2 - containerRect.top;
+                const endX = endRect.left + endRect.width / 2 - containerRect.left;
+                const endY = endRect.top + endRect.height / 2 - containerRect.top;
+                
+                let progress = 0;
+                const duration = 500; // ms
+
+                function draw(timestamp) {
+                    if (!lastTimestamp) lastTimestamp = timestamp;
+                    progress += timestamp - lastTimestamp;
+                    lastTimestamp = timestamp;
+                    let t = Math.min(progress / duration, 1);
+
+                    const currentX = startX + (endX - startX) * t;
+                    const currentY = startY + (endY - startY) * t;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(currentX, currentY);
+                    ctx.strokeStyle = 'var(--secondary-color)';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    
+                    if (t < 1) {
+                        requestAnimationFrame(draw);
+                    } else {
+                        if (callback) callback();
+                    }
+                }
+                
+                let lastTimestamp;
+                requestAnimationFrame(draw);
+            }
+            
+             function resizeCanvas() {
+                const container = document.getElementById('solution-container');
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                resetSimulation();
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+        });
+    </script>
+
+</body>
+</html>
