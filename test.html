@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparatif : NotebookLM vs. AnythingLLM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+        }
+        :root {
+            --primary-color: #00A99D; /* Teal */
+            --secondary-color: #3F2A56; /* Dark Purple */
+        }
+        .solution-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .solution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .feature-item {
+            border-left: 3px solid var(--primary-color);
+        }
+        .feature-icon {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .verdict-card {
+            border-top: 4px solid;
+        }
+        .verdict-notebooklm { border-color: #4A90E2; } /* Blue for NotebookLM */
+        .verdict-anythingllm { border-color: #50E3C2; } /* Teal for AnythingLLM */
+    </style>
+</head>
+<body class="text-slate-700">
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-12">
+            <img src="logo-bert-consultant-xs.jpg" alt="Logo Bert Consultant" class="h-16 mx-auto mb-4">
+            <h1 class="text-4xl font-bold" style="color: var(--secondary-color);">Synthèse & Exploration de Documents</h1>
+            <p class="text-xl mt-2 text-slate-500">Tableau de Bord Comparatif : NotebookLM vs. AnythingLLM</p>
+        </header>
+
+        <!-- Main Comparison Section -->
+        <section class="mb-16">
+            <div class="grid lg:grid-cols-2 gap-8 items-stretch">
+                <!-- NotebookLM Card -->
+                <div class="solution-card bg-white p-8 rounded-xl shadow-lg flex flex-col">
+                    <img src="Capture_NbLM.PNG" alt="Interface NotebookLM" class="rounded-lg mb-6 shadow-md w-full max-w-full object-contain bg-white" style="max-height:400px;">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--secondary-color);">NotebookLM</h2>
+                    <p class="text-slate-600 mb-6 flex-grow">Assistant de recherche et de rédaction personnel, basé sur l'IA de Google, pour interagir avec des documents.</p>
+                    <a href="https://notebooklm.google/" target="_blank" rel="noopener noreferrer" class="w-full text-center font-semibold py-2 px-4 rounded-lg text-white transition-colors" style="background-color: #4A90E2;">Visiter le site</a>
+                </div>
+                <!-- AnythingLLM Card -->
+                <div class="solution-card bg-white p-8 rounded-xl shadow-lg flex flex-col">
+                    <img src="anythingllm-desktop.png" alt="Interface de AnythingLLM" class="rounded-lg mb-6 shadow-md w-full max-w-full object-contain bg-white" style="max-height:400px;">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--secondary-color);">AnythingLLM</h2>
+                    <p class="text-slate-600 mb-6 flex-grow">Plateforme open-source pour construire des chatbots de type "chat-avec-vos-documents".</p>
+                     <a href="https://anythingllm.com/" target="_blank" rel="noopener noreferrer" class="w-full text-center font-semibold py-2 px-4 rounded-lg text-white transition-colors" style="background-color: var(--primary-color);">Visiter le site</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Matrix -->
+        <section class="mb-16 bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Comparatif Détaillé</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="p-4 font-semibold text-slate-600">Critère</th>
+                            <th class="p-4 font-semibold text-slate-600 text-center">NotebookLM</th>
+                            <th class="p-4 font-semibold text-slate-600 text-center">AnythingLLM</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Cible Principale</td><td class="p-4 text-center">Chercheurs, Analystes</td><td class="p-4 text-center">Équipes</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Cas d'Usage Clé</td><td class="p-4 text-center">Prise de notes, synthèse et remue-méninges à partir de sources personnelles.</td><td class="p-4 text-center">Création d'une base de connaissance centralisée et sécurisée pour le support, la R&D, etc.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Hébergement & Données</td><td class="p-4 text-center">Cloud (Google).</td><td class="p-4 text-center">Auto-hébergé (On-Premise) ou via un fournisseur Cloud.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Collaboration</td><td class="p-4 text-center">Limitée. Partage de "notebooks" possible mais limité.</td><td class="p-4 text-center">Natif. Gestion multi-utilisateurs et d'espaces de travail (workspaces) distincts.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Modèles d'IA</td><td class="p-4 text-center">Uniquement les modèles de Google (Gemini).</td><td class="p-4 text-center">Flexible. Supporte OpenAI, Azure, Anthropic, Ollama (modèles locaux), etc.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Coûts</td><td class="p-4 text-center">Gratuit actuellement. Potentiels coûts d'API à l'avenir.</td><td class="p-4 text-center">Logiciel gratuit. Coûts liés à l'hébergement du serveur et aux appels API du LLM choisi.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Intégration (API)</td><td class="p-4 text-center">Pas d'API publique pour intégrer NotebookLM dans d'autres systèmes.</td><td class="p-4 text-center">API complète pour intégrer le chatbot dans d'autres applications.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Sécurité</td><td class="p-4 text-center">Sécurité de l'écosystème Google, mais les données quittent le poste de travail.</td><td class="p-4 text-center">Sécurité en auto-hébergement, les données ne quittent pas l'infrastructure.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Use Case Suitability -->
+        <section class="mb-16 bg-white p-8 rounded-xl shadow-lg">
+             <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Adéquation aux Tâches Métier</h2>
+             <div class="grid lg:grid-cols-2 gap-8 items-center">
+                <div class="chart-container">
+                    <canvas id="suitabilityChart"></canvas>
+                </div>
+                <div class="text-slate-600 space-y-4">
+                    <p>Graphique radar:  évaluation de la pertinence de chaque outil pour des sous-tâches métier spécifiques.</p>
+                    <div class="feature-item p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Analyse Rapide de Contrat (Individuel)</h4>
+                        <p class="text-sm">Pour un consultant seul qui a besoin de comprendre rapidement les points clés d'un contrat, <strong style="color:#4A90E2">NotebookLM</strong> est plus direct et rapide à mettre en place.</p>
+                    </div>
+                     <div class="feature-item p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Base de Connaissance d'Équipe</h4>
+                        <p class="text-sm">Pour créer un référentiel documentaire partagé et sécurisé pour toute une équipe, <strong style="color:var(--primary-color);">AnythingLLM</strong> est supérieur grâce à sa gestion des utilisateurs et des espaces de travail.</p>
+                    </div>
+                     <div class="feature-item p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Validation de Clauses (Confidentialité Maximale)</h4>
+                        <p class="text-sm">Lorsqu'il s'agit de documents hautement confidentiels, la capacité d'auto-hébergement de <strong style="color:var(--primary-color);">AnythingLLM</strong> avec un LLM local est un avantage décisif.</p>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section>
+            <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Synthèse & Recommandations</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="verdict-card verdict-notebooklm bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold mb-3" style="color: #4A90E2;">Verdict pour NotebookLM</h3>
+                    <p class="text-slate-600 mb-4">Excellent outil pour une exploration approfondie des documents. Sa simplicité et sa gratuité en font un point de départ parfait pour l'analyse rapide de documents. Il est idéal pour un consultant qui souhaite rapidement extraire des idées, générer des résumés ou poser des questions sur un corpus documentaire.</p>
+                    <p class="font-semibold text-slate-700">Idéal pour : <span class="font-normal">Prise de brief rapide, recherche d'informations ponctuelles, rédaction de synthèses personnelles.</span></p>
+                </div>
+                 <div class="verdict-card verdict-anythingllm bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold mb-3" style="color: var(--primary-color);">Verdict pour AnythingLLM</h3>
+                    <p class="text-slate-600 mb-4">Solution robuste et sécurisée pour un déploiement local. Sa flexibilité (choix du LLM, API), sa gestion multi-utilisateurs et ses options d'auto-hébergement en font l'outil de choix pour construire une base de connaissance durable, collaborative et maîtrisée.</p>
+                    <p class="font-semibold text-slate-700">Idéal pour : <span class="font-normal">Base de connaissance centralisée, support client interne, R&D collaborative, conformité RGPD.</span></p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="text-white text-center py-6 mt-12" style="background-color: var(--secondary-color);">
+        <p>&copy;2025 JRBC - Analyse des processus métier</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Radar Chart
+            const ctxSuitability = document.getElementById('suitabilityChart')?.getContext('2d');
+            if (ctxSuitability) {
+                new Chart(ctxSuitability, {
+                    type: 'radar',
+                    data: {
+                        labels: [
+                            'Analyse Rapide (Individuel)', 
+                            'Base de Connaissance Équipe', 
+                            'Confidentialité des Données', 
+                            'Facilité de Prise en Main', 
+                            'Intégration & API'
+                        ],
+                        datasets: [{
+                            label: 'NotebookLM',
+                            data: [5, 2, 3, 5, 1],
+                            borderColor: '#4A90E2',
+                            backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                            pointBackgroundColor: '#4A90E2',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#4A90E2'
+                        }, {
+                            label: 'AnythingLLM',
+                            data: [4, 5, 5, 3, 5],
+                            borderColor: 'var(--primary-color)',
+                            backgroundColor: 'rgba(0, 169, 157, 0.2)',
+                            pointBackgroundColor: 'var(--primary-color)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'var(--primary-color)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Adéquation par Cas d\'Usage (Score sur 5)',
+                                font: { size: 16, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            r: {
+                                suggestedMin: 0,
+                                suggestedMax: 5,
+                                pointLabels: {
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
