@@ -89,14 +89,16 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
-                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Cible Principale</td><td class="p-4 text-center">Chercheurs, Analystes</td><td class="p-4 text-center">Équipes</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Cas d'Usage Clé</td><td class="p-4 text-center">Prise de notes, synthèse et remue-méninges à partir de sources personnelles.</td><td class="p-4 text-center">Création d'une base de connaissance centralisée et sécurisée pour le support, la R&D, etc.</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Hébergement & Données</td><td class="p-4 text-center">Cloud (Google).</td><td class="p-4 text-center">Auto-hébergé (On-Premise) ou via un fournisseur Cloud.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Adapté pour </td><td class="p-4 text-center">Chercheurs, Analystes</td><td class="p-4 text-center">Équipes</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Cas d'Usage Clé</td><td class="p-4 text-center">Exploration, Prise de notes, synthèse et remue-méninges à partir de sources personnelles(Documents PDFs, Words...).</td><td class="p-4 text-center">Création d'une base de connaissance centralisée et sécurisée pour le support, la R&D, etc.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Hébergement & Données</td><td class="p-4 text-center">Cloud (Google). auto-hébergement non disponible actuellement.</td><td class="p-4 text-center">Auto-hébergé (On-Premise) ou via un fournisseur Cloud.</td></tr>
                         <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Collaboration</td><td class="p-4 text-center">Limitée. Partage de "notebooks" possible mais limité.</td><td class="p-4 text-center">Natif. Gestion multi-utilisateurs et d'espaces de travail (workspaces) distincts.</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Modèles d'IA</td><td class="p-4 text-center">Uniquement les modèles de Google (Gemini).</td><td class="p-4 text-center">Flexible. Supporte OpenAI, Azure, Anthropic, Ollama (modèles locaux), etc.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Modèles d'IA</td><td class="p-4 text-center">Uniquement Gemini sur toutes ses versions.</td><td class="p-4 text-center">Flexible. Supporte OpenAI, Azure, Anthropic, Ollama (modèles locaux), etc.</td></tr>
                         <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Coûts</td><td class="p-4 text-center">Gratuit actuellement. Potentiels coûts d'API à l'avenir.</td><td class="p-4 text-center">Logiciel gratuit. Coûts liés à l'hébergement du serveur et aux appels API du LLM choisi.</td></tr>
                         <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Intégration (API)</td><td class="p-4 text-center">Pas d'API publique pour intégrer NotebookLM dans d'autres systèmes.</td><td class="p-4 text-center">API complète pour intégrer le chatbot dans d'autres applications.</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Sécurité</td><td class="p-4 text-center">Sécurité de l'écosystème Google, mais les données quittent le poste de travail.</td><td class="p-4 text-center">Sécurité en auto-hébergement, les données ne quittent pas l'infrastructure.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Sécurité</td><td class="p-4 text-center">Sécurité de l'écosystème Google.</td><td class="p-4 text-center">Sécurité en auto-hébergement ou via un fournisseur Cloud.</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-4 font-semibold" style="color:var(--primary-color);">Prise en main, configuration & maintenance</td><td class="p-4 text-center">Très simple, aucune configuration technique requise, maintenance assurée par Google.</td><td class="p-4 text-center">Nécessite une installation initiale, configuration technique (hébergement, API LLM, sécurité), et une maintenance régulière.</td></tr>
+                        
                     </tbody>
                 </table>
             </div>
@@ -104,24 +106,43 @@
 
         <!-- Use Case Suitability -->
         <section class="mb-16 bg-white p-8 rounded-xl shadow-lg">
-             <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Adéquation aux Tâches Métier</h2>
+             <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Adéquation aux Tâches</h2>
              <div class="grid lg:grid-cols-2 gap-8 items-center">
                 <div class="chart-container">
                     <canvas id="suitabilityChart"></canvas>
                 </div>
                 <div class="text-slate-600 space-y-4">
-                    <p>Graphique radar:  évaluation de la pertinence de chaque outil pour des sous-tâches métier spécifiques.</p>
+                    <p>Pour chaque cas d'usage métier, voici l'adéquation des outils selon les critères clés du comparatif détaillé :</p>
                     <div class="feature-item p-4 bg-slate-50 rounded-lg">
-                        <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Analyse Rapide de Contrat (Individuel)</h4>
-                        <p class="text-sm">Pour un consultant seul qui a besoin de comprendre rapidement les points clés d'un contrat, <strong style="color:#4A90E2">NotebookLM</strong> est plus direct et rapide à mettre en place.</p>
+                        <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Analyse Rapide documentaire</h4>
+                        <ul class="list-disc ml-5 text-sm">
+                            <li><strong>Prise en main :</strong> <span style="color:#4A90E2">NotebookLM</span> est immédiat, aucune configuration requise.</li>
+                            <li><strong>Sécurité :</strong> Données hébergées chez Google, adapté si la confidentialité n'est pas critique.</li>
+                            <li><strong>Modèles d'IA :</strong> Accès direct à Gemini, efficace pour la synthèse rapide.</li>
+                        </ul>
                     </div>
-                     <div class="feature-item p-4 bg-slate-50 rounded-lg">
+                    <div class="feature-item p-4 bg-slate-50 rounded-lg">
                         <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Base de Connaissance d'Équipe</h4>
-                        <p class="text-sm">Pour créer un référentiel documentaire partagé et sécurisé pour toute une équipe, <strong style="color:var(--primary-color);">AnythingLLM</strong> est supérieur grâce à sa gestion des utilisateurs et des espaces de travail.</p>
+                        <ul class="list-disc ml-5 text-sm">
+                            <li><strong>Collaboration :</strong> <span style="color:var(--primary-color);">AnythingLLM</span> gère nativement les utilisateurs et espaces de travail.</li>
+                            <li><strong>Sécurité :</strong> Données maîtrisées (auto-hébergement possible).</li>
+                            <li><strong>Intégration :</strong> API complète pour connecter à d'autres outils.</li>
+                        </ul>
                     </div>
-                     <div class="feature-item p-4 bg-slate-50 rounded-lg">
+                    <div class="feature-item p-4 bg-slate-50 rounded-lg">
                         <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Validation de Clauses (Confidentialité Maximale)</h4>
-                        <p class="text-sm">Lorsqu'il s'agit de documents hautement confidentiels, la capacité d'auto-hébergement de <strong style="color:var(--primary-color);">AnythingLLM</strong> avec un LLM local est un avantage décisif.</p>
+                        <ul class="list-disc ml-5 text-sm">
+                            <li><strong>Sécurité :</strong> <span style="color:var(--primary-color);">AnythingLLM</span> permet un contrôle total des données (hébergement local).</li>
+                            <li><strong>Modèles d'IA :</strong> Possibilité d'utiliser des modèles locaux (Ollama, etc.).</li>
+                            <li><strong>Maintenance :</strong> Demande une gestion technique continue.</li>
+                        </ul>
+                    </div>
+                    <div class="feature-item p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-lg" style="color: var(--secondary-color);">Intégration dans un SI ou application métier</h4>
+                        <ul class="list-disc ml-5 text-sm">
+                            <li><strong>Intégration :</strong> <span style="color:var(--primary-color);">AnythingLLM</span> propose une API robuste, NotebookLM n'en propose pas.</li>
+                            <li><strong>Coûts :</strong> Dépend du choix du LLM et de l'infrastructure.</li>
+                        </ul>
                     </div>
                 </div>
              </div>
@@ -129,17 +150,17 @@
 
         <!-- Conclusion -->
         <section>
-            <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Synthèse & Recommandations</h2>
+            <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--secondary-color);">Synthèse</h2>
             <div class="grid md:grid-cols-2 gap-8">
                 <div class="verdict-card verdict-notebooklm bg-white p-6 rounded-lg shadow-md">
                     <h3 class="text-2xl font-bold mb-3" style="color: #4A90E2;">Verdict pour NotebookLM</h3>
-                    <p class="text-slate-600 mb-4">Excellent outil pour une exploration approfondie des documents. Sa simplicité et sa gratuité en font un point de départ parfait pour l'analyse rapide de documents. Il est idéal pour un consultant qui souhaite rapidement extraire des idées, générer des résumés ou poser des questions sur un corpus documentaire.</p>
-                    <p class="font-semibold text-slate-700">Idéal pour : <span class="font-normal">Prise de brief rapide, recherche d'informations ponctuelles, rédaction de synthèses personnelles.</span></p>
+                    <p class="text-slate-600 mb-4">Excellent outil pour une exploration approfondie des documents. Sa simplicité et sa gratuité en font un point de départ parfait pour l'analyse rapide de documents. Il est idéal pour une rapidement extraction des idées, génération des résumés ou poser des questions sur un corpus documentaire.</p>
+                    <p class="font-semibold text-slate-700">Idéal pour : <span class="font-normal">Prise de brief rapide, recherche d'informations ponctuelles, rédaction de synthèses.</span></p>
                 </div>
                  <div class="verdict-card verdict-anythingllm bg-white p-6 rounded-lg shadow-md">
                     <h3 class="text-2xl font-bold mb-3" style="color: var(--primary-color);">Verdict pour AnythingLLM</h3>
                     <p class="text-slate-600 mb-4">Solution robuste et sécurisée pour un déploiement local. Sa flexibilité (choix du LLM, API), sa gestion multi-utilisateurs et ses options d'auto-hébergement en font l'outil de choix pour construire une base de connaissance durable, collaborative et maîtrisée.</p>
-                    <p class="font-semibold text-slate-700">Idéal pour : <span class="font-normal">Base de connaissance centralisée, support client interne, R&D collaborative, conformité RGPD.</span></p>
+                    <p class="font-semibold text-slate-700">Idéal pour : <span class="font-normal">Base de connaissance centralisée, support interne, conformité RGPD.</span></p>
                 </div>
             </div>
         </section>
@@ -167,7 +188,7 @@
                         ],
                         datasets: [{
                             label: 'NotebookLM',
-                            data: [5, 2, 3, 5, 1],
+                            data: [5, 5, 4, 5, 1],
                             borderColor: '#4A90E2',
                             backgroundColor: 'rgba(74, 144, 226, 0.2)',
                             pointBackgroundColor: '#4A90E2',
