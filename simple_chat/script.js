@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatBox = document.getElementById("chat-box");
     const userInput = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
-    const webhookUrl = "https://jeytobermories.app.n8n.cloud/webhook-test/37f5b391-a238-4bfd-91cc-178e97a0e009";
+    const webhookUrl = "https://jeytobermories.app.n8n.cloud/webhook-test/groove_nomad";
 
     function addMessage(text, sender) {
         const messageElement = document.createElement("div");
