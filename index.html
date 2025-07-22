@@ -314,7 +314,6 @@
                 <li><a href="#analyse" class="nav-link text-gray-600 hover:text-gray-900">Analyse</a></li>
                 <li><a href="#solution" class="nav-link text-gray-600 hover:text-gray-900">La Solution</a></li>
                 <li><a href="#redaction" class="nav-link text-gray-600 hover:text-gray-900">Rédaction de contrat</a></li>
-                <li><a href="test.html" class="nav-link text-gray-600 hover:text-gray-900">Tests</a></li>
             </ul>
         </nav>
     </header>
@@ -1077,4 +1076,141 @@
                         const rowIndex = e.target.dataset.rowIndex;
                         const colIndex = e.target.dataset.colIndex;
                         document.getElementById(`row-header-${rowIndex}`).classList.add('highlight-strong');
-                        document.getElementById(`col-header-${colIndex}`
+                        document.getElementById(`col-header-${colIndex}`).classList.add('highlight-strong');
+                        e.target.classList.add('highlight-weak');
+                    }
+                });
+
+                tbody.addEventListener('mouseout', (e) => {
+                    if (e.target.tagName === 'TD') {
+                        const rowIndex = e.target.dataset.rowIndex;
+                        const colIndex = e.target.dataset.colIndex;
+                        document.getElementById(`row-header-${rowIndex}`).classList.remove('highlight-strong');
+                        document.getElementById(`col-header-${colIndex}`).classList.remove('highlight-strong');
+                        e.target.classList.remove('highlight-weak');
+                    }
+                });
+            }
+            
+            createInteractiveTable();
+
+            // --- New Solution Section Logic ---
+            const poleCards = document.querySelectorAll('.pole-card');
+            const solutionDetails = document.querySelectorAll('.solution-details');
+
+            function drawN8nArrows(svgId, diagramId) {
+                const svg = document.getElementById(svgId);
+                if(!svg) return;
+                svg.innerHTML = ''; // Clear previous arrows
+                const diagram = document.getElementById(diagramId);
+                 if(!diagram) return;
+                const containerRect = diagram.getBoundingClientRect();
+                
+                let connections;
+                if (diagramId === 'n8n-diagram-2') {
+                    connections = [
+                        ['node-2-1', 'node-2-3'], ['node-2-2', 'node-2-3'],
+                        ['node-2-3', 'node-2-4'], ['node-2-3', 'node-2-5'],
+                        ['node-2-4', 'node-2-7'], ['node-2-5', 'node-2-7']
+                    ];
+                } else {
+                     connections = [
+                        ['node-3-1', 'node-3-3'],
+                        ['node-3-3', 'node-3-6'],
+                        ['node-3-6', 'node-3-8']
+                    ];
+                }
+
+                connections.forEach(conn => {
+                    const startNode = document.getElementById(conn[0]);
+                    const endNode = document.getElementById(conn[1]);
+                    if(!startNode || !endNode) return;
+                    
+                    const startRect = startNode.getBoundingClientRect();
+                    const endRect = endNode.getBoundingClientRect();
+
+                    const startX = (startRect.right - containerRect.left);
+                    const startY = startRect.top + startRect.height / 2 - containerRect.top;
+                    const endX = (endRect.left - containerRect.left);
+                    const endY = endRect.top + endRect.height / 2 - containerRect.top;
+                    
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const d = `M ${startX} ${startY} C ${startX + 60} ${startY}, ${endX - 60} ${endY}, ${endX} ${endY}`;
+                    path.setAttribute('d', d);
+                    path.setAttribute('stroke', 'var(--secondary-color)');
+                    path.setAttribute('stroke-width', '2');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                    
+                    const pathLength = path.getTotalLength();
+                    path.style.strokeDasharray = pathLength;
+                    path.style.strokeDashoffset = pathLength;
+                    path.style.animation = `draw-line 0.8s ease-out forwards ${Math.random() * 0.4}s`;
+                    path.style.animationName = 'draw-line'; // Ensure animation name is set for CSS keyframes
+
+                    svg.appendChild(path);
+                });
+            }
+            
+            // Define arrowhead marker for SVGs and keyframe animation
+            const defs = `
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="var(--secondary-color)" />
+                    </marker>
+                </defs>
+                <style>
+                    @keyframes draw-line { to { stroke-dashoffset: 0; } }
+                </style>
+            `;
+            document.body.insertAdjacentHTML('beforeend', `<svg style="width:0;height:0;position:absolute;">${defs}</svg>`);
+
+            poleCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const targetId = card.id + '-details';
+                    
+                    poleCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+
+                    solutionDetails.forEach(detail => {
+                        if (detail.id === targetId) {
+                            detail.classList.add('show');
+                            const diagramId = 'n8n-diagram-' + targetId.charAt(5);
+                            const svgId = 'n8n-svg-' + targetId.charAt(5);
+                             if (document.getElementById(diagramId)) {
+                                setTimeout(() => drawN8nArrows(svgId, diagramId), 50);
+                             }
+                        } else {
+                            detail.classList.remove('show');
+                        }
+                    });
+                });
+            });
+
+            // Logic for the new Redaction section
+            const redactionTabButtons = document.querySelectorAll('.redaction-tab-button');
+            const redactionTabContents = document.querySelectorAll('.redaction-tab-content');
+
+            redactionTabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tabContent;
+
+                    redactionTabButtons.forEach(btn => btn.classList.remove('active', 'border-indigo-500', 'text-indigo-600', 'bg-indigo-100'));
+                    button.classList.add('active', 'border-indigo-500', 'text-indigo-600', 'bg-indigo-100');
+
+                    redactionTabContents.forEach(content => {
+                        if (content.id === tabId + '-content') {
+                            content.classList.add('active');
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.remove('active');
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
